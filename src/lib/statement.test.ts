@@ -1,5 +1,9 @@
-import { describe, expect, it } from "vitest";
-import { ACCOUNTS, computeStatement, STATEMENT } from "./statement";
+﻿import { describe, expect, it } from "vitest";
+import { ACCOUNTS, computeStatement, STATEMENT, type ComputedLine } from "./statement";
+
+type ValueLine = Exclude<ComputedLine, { kind: "heading" }>;
+const lineOf = (lines: ComputedLine[], ref: string) =>
+  lines.find((l): l is ValueLine => (l.kind === "account" && l.code === ref) || (l.kind === "total" && l.key === ref));
 
 describe("ACCOUNTS", () => {
   it("มีรหัสบัญชีไม่ซ้ำ และครอบคลุมทุกรหัสที่ STATEMENT ใช้", () => {
@@ -25,12 +29,12 @@ describe("computeStatement", () => {
   it("บัญชีที่ไม่มีข้อมูลนับเป็น 0", () => {
     const s = computeStatement({});
     expect(s.totals.PBT).toBe(0);
-    expect(s.lines.find((l) => l.kind === "account" && l.code === "A")?.value).toBe(0);
+    expect(lineOf(s.lines, "A")?.value).toBe(0);
   });
 
   it("คิด % ต่อรายได้รวม และเป็น null เมื่อรายได้เป็น 0", () => {
     const s = computeStatement({ A: 200, R: 50 });
-    expect(s.lines.find((l) => l.kind === "total" && l.key === "ADMIN")?.pctOfRevenue).toBe(25);
-    expect(computeStatement({ R: 50 }).lines.find((l) => l.kind === "total" && l.key === "ADMIN")?.pctOfRevenue).toBeNull();
+    expect(lineOf(s.lines, "ADMIN")?.pctOfRevenue).toBe(25);
+    expect(lineOf(computeStatement({ R: 50 }).lines, "ADMIN")?.pctOfRevenue).toBeNull();
   });
 });
