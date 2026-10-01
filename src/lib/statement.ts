@@ -133,8 +133,8 @@ export function computeStatement(amounts: Record<string, number>): Statement {
   const lines: ComputedLine[] = STATEMENT.map((line) => {
     if (line.kind === "heading") return line;
     if (line.kind === "account") return { ...line, value: values[line.code], pctOfRevenue: pct(values[line.code]) };
-    const { terms: _terms, ...rest } = line;
-    return { ...rest, value: values[line.key], pctOfRevenue: pct(values[line.key]) };
+    const { kind, key, name, emphasis } = line;
+    return { kind, key, name, emphasis, value: values[key], pctOfRevenue: pct(values[key]) };
   });
 
   const totals = Object.fromEntries(

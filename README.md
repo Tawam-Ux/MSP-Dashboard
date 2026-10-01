@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MSP Dashboard
 
-## Getting Started
+Dashboard งบกำไรขาดทุนรายเดือนของ MSP จากไฟล์ Excel รันบนเครื่อง local
+รายละเอียดการออกแบบอยู่ใน [docs/spec.md](docs/spec.md)
 
-First, run the development server:
+## ติดตั้งครั้งแรก
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. ติดตั้ง **MySQL Server 8.4** และ **MySQL Workbench** จาก MySQL Installer for Windows
+2. สร้างฐานข้อมูล (ใน Workbench หรือ `mysql -u root -p`):
+   ```sql
+   CREATE DATABASE msp_dashboard CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+   ```
+3. คัดลอก `.env.example` เป็น `.env` แล้วแก้ค่า:
+   - `DATABASE_URL` ใส่รหัสผ่าน root ของ MySQL
+   - `AUTH_SECRET` สร้างด้วย `npx auth secret` (หรือสุ่มข้อความยาวๆ)
+   - `ADMIN_PASSWORD` รหัสผ่านของบัญชี `admin`
+4. ติดตั้งและเตรียมฐานข้อมูล:
+   ```powershell
+   npm install
+   npm run db:push     # สร้างตาราง
+   npm run db:seed     # สร้าง role, permission, ผังบัญชี, บัญชี admin
+   npm run import -- Data.xlsx 2026   # นำเข้าไฟล์ตัวอย่าง (ปี ค.ศ.)
+   ```
+5. เปิดระบบ:
+   ```powershell
+   npm run dev                       # ระหว่างพัฒนา
+   npm run build; npm start          # ใช้งานจริง
+   ```
+   แล้วเข้า http://localhost:3000 ด้วยชื่อผู้ใช้ `admin`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## นำเข้าเดือนใหม่
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+เข้าเมนู **นำเข้าข้อมูล** เลือกไฟล์และปี พ.ศ. กด **ตรวจไฟล์** เพื่อดูสรุปก่อน แล้วกด **นำเข้าข้อมูล**
+ถ้านำเข้างวดเดิมซ้ำ ข้อมูลเก่าของงวดนั้นจะถูกแทนที่ทั้งหมด
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ถ้าไฟล์มีรหัสบัญชีใหม่ ระบบจะไม่ยอมนำเข้า ต้องเพิ่มบัญชีใน `src/lib/statement.ts` ก่อน
 
-## Learn More
+## ระบบสิทธิ์
 
-To learn more about Next.js, take a look at the following resources:
+- **บทบาท** กำหนดว่าทำอะไรได้: admin, executive, accountant, branch_manager (`src/lib/authz/scope.ts`)
+- **หน่วย** กำหนดว่าเห็นข้อมูลส่วนไหน ให้สิทธิ์หน่วยแม่จะเห็นสาขาย่อยทั้งหมด
+- ข้อมูลการเงินทุกจุดดึงผ่าน `src/lib/reports.ts` ซึ่งกรองตามหน่วยที่ผู้ใช้มีสิทธิ์
+- เมื่อเชื่อมเว็บหลัก: เพิ่ม provider ใน `src/auth.ts` แล้วจับคู่ผู้ใช้ด้วย `users.auth_provider` + `users.external_id`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## คำสั่ง
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| คำสั่ง | ทำอะไร |
+|---|---|
+| `npm test` | รัน test (ตัวแปลงไฟล์ใช้ `Data.xlsx` ถ้ามี) |
+| `npm run typecheck` | ตรวจ TypeScript |
+| `npm run lint` | ตรวจโค้ดด้วย ESLint |
