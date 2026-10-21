@@ -1,82 +1,233 @@
 @import "tailwindcss";
 
+/* ===== ธีม "เส้นทางรถไฟฟ้า" =====
+   ผังหน่วย MSP → หน่วยงาน → Zone → Op/Sz → หน่วย คือสายรถไฟ การเจาะลงหน่วยคือการนั่งไปทีละสถานี
+   พื้นเทาเย็น · การ์ดขาวโค้งมน · ตัวอักษรเกือบดำ · สีของแต่ละ "สาย" ทำหน้าที่เป็นสีของตัวชี้วัด
+   แดง MSP = เส้นทางที่ผ่านมา โลโก้ และหน้า Login · สถานะที่เลือก (แท็บ เมนู) = หมึกเข้มสีเดียว
+   ขาดทุนใช้แดงเข้ม + เครื่องหมายลบ + ป้าย เสมอ (ไม่สื่อด้วยสีอย่างเดียว)
+   ชื่อตัวแปรเดิม (--navy, --brand, --good ...) คงไว้ให้ทุกหน้าใช้ต่อได้ */
 :root {
   color-scheme: light;
-  --plane: #f3f5f4;
+  --plane: #f3f4f7;
   --surface: #ffffff;
-  --ink: #15212b;
-  --ink-2: #55606a;
-  --ink-3: #7b858d;
-  --line: #dce1e0;
-  --line-strong: #b9c1c0;
-  --focus: #1c5cab;
-  --gain: #2a78d6;
-  --loss: #d03b3b;
-  --loss-text: #b42318;
+  --surface-2: #f4f5f8;
+  --surface-3: #eaecf1;
+  --ink: #1b1f2a;
+  --ink-2: #4b5263;
+  /* ข้อความรองต้องอ่านออกบนพื้นขาวและ surface-2 (≥ 4.5:1) */
+  --ink-3: #626979;
+  --line: #e6e8ee;
+  --line-strong: #d2d6df;
+  --focus: #2f6fd6;
 
-  /* แถบเงิน 100 บาท — ลำดับนี้ผ่านตัวตรวจสีตาบอดสีแล้ว อย่าสลับ */
-  --seg-cogs: #eb6834;
-  --seg-selling: #1baf7a;
-  --seg-admin: #eda100;
-  --seg-finance: #e87ba4;
-  --seg-profit: #2a78d6;
+  --navy: #1b1f2a;
+  --brand: #2f6fd6;
+  --brand-soft: #ebf1fc;
+  --brand-line: #c3d5f4;
+  --btn: #1b1f2a;
+  --btn-fg: #ffffff;
+  --btn-hover: #343a48;
+  --pill: #1b1f2a;
+  --pill-fg: #ffffff;
+  /* แดงแบรนด์ MSP: เส้นทาง โลโก้ หน้า Login */
+  --accent: #d3263a;
+  --accent-soft: #fdebed;
+
+  --good: #1f7a5c;
+  --good-soft: #e4f4ec;
+  --good-line: #bfe2d1;
+  --ok: #1f7a5c;
+  --ok-soft: #e4f4ec;
+  --warn: #c27c0e;
+  --warn-text: #8a5600;
+  --warn-soft: #fdf3e1;
+  --warn-line: #f1d9a8;
+  --gain: #1f7a5c;
+  --loss: #d3263a;
+  --loss-text: #b4161f;
+  --loss-soft: #fde8ea;
+  --loss-line: #f5c4ca;
+
+  /* สีสาย = สีตัวชี้วัด (ป้ายวงกลมหน้า KPI · เส้นกราฟ) */
+  --line-msp: #d3263a;
+  --line-rev: #2f6fd6;
+  --line-gp: #237a61;
+  --line-op: #e3a21a;
+  --line-pbt: #7b4fc9;
+  --on-line: #ffffff;
+  --on-line-light: #1b1f2a;
+  --route-off: #d9dce4;
+
+  /* แถบเงิน 100 บาท */
+  --seg-cogs: #2c3240;
+  --seg-selling: #2f6fd6;
+  --seg-admin: #3aa17e;
+  --seg-finance: #b5bac6;
+  --seg-profit: #7b4fc9;
+
+  --shadow: 0 1px 2px rgba(22, 27, 40, 0.04), 0 8px 24px -12px rgba(22, 27, 40, 0.12);
+  --shadow-pop: 0 2px 6px rgba(22, 27, 40, 0.06), 0 18px 40px -12px rgba(22, 27, 40, 0.24);
+
+  /* ลากเลือกข้อความ: เหลืองอ่อนแบบปากกาเน้นข้อความ */
+  --selection: #FFFFCC;
+  --selection-ink: #1b1f2a;
+
+  --r-card: 28px;
+  --r-inner: 18px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --plane: #0f1514;
-    --surface: #18201f;
-    --ink: #e8eeee;
-    --ink-2: #aab5b6;
-    --ink-3: #85908f;
-    --line: #2a3533;
-    --line-strong: #3d4a48;
-    --focus: #6da7ec;
-    --gain: #3987e5;
-    --loss: #e66767;
-    --loss-text: #f08a8a;
-    --seg-cogs: #d95926;
-    --seg-selling: #199e70;
-    --seg-admin: #c98500;
-    --seg-finance: #d55181;
-    --seg-profit: #3987e5;
+    --plane: #0e1117;
+    --surface: #171b23;
+    --surface-2: #1f242e;
+    --surface-3: #282e3a;
+    --ink: #eceef3;
+    --ink-2: #b6bcc9;
+    --ink-3: #9198a8;
+    --line: #272d38;
+    --line-strong: #363d4b;
+    --focus: #7ea9f2;
+    --navy: #eceef3;
+    --brand: #7ea9f2;
+    --brand-soft: #1a2944;
+    --brand-line: #2d4a7b;
+    --btn: #eceef3;
+    --btn-fg: #11141a;
+    --btn-hover: #ffffff;
+    --pill: #eceef3;
+    --pill-fg: #11141a;
+    --accent: #f06a78;
+    --accent-soft: #34181d;
+    --good: #5fcfa3;
+    --good-soft: #13291f;
+    --good-line: #1f4636;
+    --ok: #5fcfa3;
+    --ok-soft: #13291f;
+    --warn: #f0b54a;
+    --warn-text: #f3c46e;
+    --warn-soft: #2d2412;
+    --warn-line: #4b3a18;
+    --gain: #5fcfa3;
+    --loss: #f06a78;
+    --loss-text: #f5939d;
+    --loss-soft: #321519;
+    --loss-line: #5a232b;
+    --line-msp: #ec5465;
+    --line-rev: #6f9ff0;
+    --line-gp: #4fbf95;
+    --line-op: #f0b54a;
+    --line-pbt: #a888e8;
+    --on-line: #11141a;
+    --on-line-light: #11141a;
+    --route-off: #343b49;
+    --seg-cogs: #8a93a8;
+    --seg-selling: #6f9ff0;
+    --seg-admin: #4fbf95;
+    --seg-finance: #4a5162;
+    --seg-profit: #a888e8;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-pop: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+    --selection: #5c4a12;
+    --selection-ink: #fff6d6;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --plane: #0f1514;
-  --surface: #18201f;
-  --ink: #e8eeee;
-  --ink-2: #aab5b6;
-  --ink-3: #85908f;
-  --line: #2a3533;
-  --line-strong: #3d4a48;
-  --focus: #6da7ec;
-  --gain: #3987e5;
-  --loss: #e66767;
-  --loss-text: #f08a8a;
-  --seg-cogs: #d95926;
-  --seg-selling: #199e70;
-  --seg-admin: #c98500;
-  --seg-finance: #d55181;
-  --seg-profit: #3987e5;
+  --plane: #0e1117;
+  --surface: #171b23;
+  --surface-2: #1f242e;
+  --surface-3: #282e3a;
+  --ink: #eceef3;
+  --ink-2: #b6bcc9;
+  --ink-3: #9198a8;
+  --line: #272d38;
+  --line-strong: #363d4b;
+  --focus: #7ea9f2;
+  --navy: #eceef3;
+  --brand: #7ea9f2;
+  --brand-soft: #1a2944;
+  --brand-line: #2d4a7b;
+  --btn: #eceef3;
+  --btn-fg: #11141a;
+  --btn-hover: #ffffff;
+  --pill: #eceef3;
+  --pill-fg: #11141a;
+  --accent: #f06a78;
+  --accent-soft: #34181d;
+  --good: #5fcfa3;
+  --good-soft: #13291f;
+  --good-line: #1f4636;
+  --ok: #5fcfa3;
+  --ok-soft: #13291f;
+  --warn: #f0b54a;
+  --warn-text: #f3c46e;
+  --warn-soft: #2d2412;
+  --warn-line: #4b3a18;
+  --gain: #5fcfa3;
+  --loss: #f06a78;
+  --loss-text: #f5939d;
+  --loss-soft: #321519;
+  --loss-line: #5a232b;
+  --line-msp: #ec5465;
+  --line-rev: #6f9ff0;
+  --line-gp: #4fbf95;
+  --line-op: #f0b54a;
+  --line-pbt: #a888e8;
+  --on-line: #11141a;
+  --on-line-light: #11141a;
+  --route-off: #343b49;
+  --seg-cogs: #8a93a8;
+  --seg-selling: #6f9ff0;
+  --seg-admin: #4fbf95;
+  --seg-finance: #4a5162;
+  --seg-profit: #a888e8;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+  --selection: #5c4a12;
+  --selection-ink: #fff6d6;
+}
+
+/* หน้า Login: ปุ่ม/โฟกัสเป็นแดงแบรนด์ */
+.theme-red {
+  --brand: var(--accent);
+  --brand-soft: var(--accent-soft);
+  --btn: #d3263a;
+  --btn-fg: #ffffff;
+  --btn-hover: #b51d30;
+  --focus: var(--accent);
+}
+.theme-red .field:focus-visible {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent);
 }
 
 @theme inline {
   --color-plane: var(--plane);
   --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
   --color-ink: var(--ink);
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-line: var(--line);
   --color-line-strong: var(--line-strong);
+  --color-navy: var(--navy);
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-line: var(--brand-line);
+  --color-accent: var(--accent);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
   --color-gain: var(--gain);
   --color-loss: var(--loss);
   --color-loss-text: var(--loss-text);
+  --color-loss-soft: var(--loss-soft);
   --font-sans: var(--font-body), system-ui, sans-serif;
-  --font-display: var(--font-display), var(--font-body), sans-serif;
+  --font-display: var(--font-body), system-ui, sans-serif;
 }
 
 body {
@@ -84,21 +235,1802 @@ body {
   color: var(--ink);
   font-family: var(--font-body), system-ui, sans-serif;
   line-height: 1.6;
+  caret-color: var(--brand);
+}
+
+::selection {
+  background: var(--selection);
+  color: var(--selection-ink);
 }
 
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 999px;
+}
+
+/* แถบเลื่อนบางโค้ง สีตามธีม */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--pill);
+  width: 1rem;
+  height: 1rem;
+}
+
+a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+code {
+  border-radius: 6px;
+  background: var(--surface-3);
+  padding: 0.05rem 0.375rem;
+  font-size: 0.85em;
 }
 
 .num {
   font-variant-numeric: tabular-nums;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+@layer components {
+  /* หัวหน้า (มีป๊อปเลือกงวด) อยู่เหนือการ์ดด้านล่างเสมอ แต่ต่ำกว่าแถบบน (z-30) */
+.page-head { position: relative; z-index: 20; }
+
+/* ===== การ์ด: ผิวขาวโค้งใหญ่ ไม่มีเส้นขอบ — ลำดับชั้นด้วยระดับผิวเท่านั้น (พื้น · การ์ด · ชั้นลอย) ===== */
+  .card {
+    background: var(--surface);
+    border-radius: var(--r-card);
+    padding: 1.375rem 1.5rem;
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+  .card-title {
+    margin: 0;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: var(--navy);
+    text-wrap: balance;
+  }
+  .card-cap {
+    margin: 0.125rem 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--ink-3);
+  }
+
+  /* ===== ขนาดการ์ด: สูงตามเนื้อหา แต่ไม่เกินเพดาน — เนื้อหายาวกว่านั้นเลื่อนใน .card-body =====
+     sm = การ์ดสรุปสั้นๆ: จำกัดเฉพาะจอกว้างที่วางคู่กัน · md/lg/xl = รายการ/ตารางยาว จำกัดทุกจอ */
+  .card-fixed {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card-fixed > :not(.card-body) { flex: none; }
+  .card-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    /* ให้ข้อความ sr-only (absolute) ในแถวที่กว้างกว่าการ์ดถูกตัดในการ์ด — ไม่งั้นหลุดไปทำให้ทั้งหน้าเลื่อนแนวนอนบนมือถือ */
+    position: relative;
+    scrollbar-gutter: stable;
+  }
+  .card-body[data-overflow],
+  .scroll-y[data-overflow] { overscroll-behavior: contain; }
+  .card-body thead th { position: sticky; top: 0; z-index: 1; }
+  /* แถว RankBar ยื่นออกซ้ายขวา 0.625rem (พื้นหลังตอนชี้/เลือก) — กล่องเลื่อนขยายออกเท่ากัน ไม่ให้มีแถบเลื่อนแนวนอน
+     !important: ชนะ pr-* ของ utility ที่ตั้งไว้ในหน้า */
+  .card-body:has(> .rank-row) { margin-inline: -0.625rem; padding-inline: 0.625rem !important; }
+  .card-md { max-height: 32rem; }
+  .card-lg { max-height: 36rem; }
+  .card-xl { max-height: 42rem; }
+  @media (min-width: 1024px) {
+    .card-sm { max-height: 28rem; }
+  }
+
+  /* ===== KPI: การ์ดมุมโค้ง (ไม่ใช่เม็ดยา) — แถวบน = ป้ายวงกลมสีสาย + ชื่อ · ตัวเลขใหญ่ · หมายเหตุ ===== */
+  .kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    background: var(--surface);
+    border-radius: 22px;
+    padding: 1rem 1.25rem 1.0625rem;
+    box-shadow: var(--shadow);
+    min-width: 0;
+  }
+  .kpi-head { display: flex; align-items: center; gap: 0.625rem; min-width: 0; }
+  .kpi-body { min-width: 0; }
+  .kpi-note {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+  /* ป้ายเปลี่ยนแปลง (<Delta> เป็น inline-flex มีไอคอน) ไม่ดันบรรทัดให้สูงขึ้น — หมายเหตุสูงเท่ากันทุกใบ ตรงกับ skeleton */
+  .kpi-note .inline-flex { vertical-align: top; }
+
+  /* ป้ายวงกลมแบบรหัสสถานี: สีสาย + รหัสสั้น */
+  .roundel {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background: var(--line-c, var(--ink));
+    color: var(--on-line);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1;
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--line-c, var(--ink)) 14%, transparent);
+  }
+  .roundel[data-light] { color: var(--on-line-light); }
+  .roundel-sm { width: 2.125rem; height: 2.125rem; font-size: 0.625rem; box-shadow: 0 0 0 3px color-mix(in srgb, var(--line-c, var(--ink)) 14%, transparent); }
+
+  /* อัตราส่วน: แถบเม็ดยาเดียว แบ่งช่องด้วยเส้นบาง */
+  .ratio-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    background: var(--surface);
+    border-radius: var(--r-card);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  @media (min-width: 640px) { .ratio-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .ratio-strip { grid-template-columns: repeat(5, minmax(0, 1fr)); border-radius: 22px; } }
+  /* เส้นแบ่งช่องวาดด้วยเงา 1px ด้านซ้าย/บน ส่วนที่ล้นขอบถูก overflow ตัดทิ้ง */
+  .ratio-card {
+    padding: 0.875rem 1.375rem;
+    box-shadow: -1px 0 0 var(--line), 0 -1px 0 var(--line);
+  }
+  @media (min-width: 1024px) { .ratio-card { box-shadow: -1px 0 0 var(--line); } }
+
+  /* ===== ตาราง: หัวตารางเป็นแถบเม็ดยา แถวคั่นด้วยเส้นบาง ===== */
+  .tbl {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.875rem;
+  }
+  .tbl thead th {
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    text-align: left;
+    padding: 0.5625rem 0.875rem;
+    white-space: nowrap;
+  }
+  .tbl thead th:first-child { border-radius: 999px 0 0 999px; }
+  .tbl thead th:last-child { border-radius: 0 999px 999px 0; }
+  .tbl tbody th,
+  .tbl tbody td {
+    padding: 0.6875rem 0.875rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .tbl tbody tr:last-child > * { border-bottom: 0; }
+  .tbl tbody tr > :first-child { border-radius: 14px 0 0 14px; }
+  .tbl tbody tr > :last-child { border-radius: 0 14px 14px 0; }
+  .row-on > * { background: var(--brand-soft); }
+  /* แถวที่กดได้ทั้งแถว: ลิงก์ชื่อหน่วยยืดพื้นที่กดเต็มแถวด้วย ::after (ลิงก์จริงตัวเดียว คีย์บอร์ด/โปรแกรมอ่านจอใช้ได้ตามปกติ) */
+  .tbl tbody tr.row-link { position: relative; cursor: pointer; }
+  .row-link-a { outline: none; }
+  .row-link-a::after { content: ""; position: absolute; inset: 0; border-radius: 14px; }
+  .row-link-a:focus-visible::after { outline: 2px solid var(--brand); outline-offset: -2px; }
+  /* เนื้อหาอื่นในแถวไม่รับเมาส์: ตัวเลข (.money-roll มีอนิเมชัน transform) และลูกศรตอนชี้ ลอยทับ ::after ของลิงก์แล้วกินคลิก */
+  .tbl tbody tr.row-link > * *:not(.row-link-a) { pointer-events: none; }
+  /* แถวหัวกลุ่มในตาราง (เช่น ศูนย์ต้นทุน): เว้นบนกว้าง ตัวเล็ก ไม่มีพื้นตอนชี้ */
+  .tbl tbody tr.row-group > th {
+    padding: 1.375rem 0.875rem 0.5rem;
+    text-align: left;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink-2);
+  }
+  .tbl tbody tr.row-group:hover > * { background-color: transparent; }
+  .tbl tbody tr.row-link:hover .row-link-a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; }
+  .row-chev { color: var(--ink-3); transition: color 0.15s var(--ease-out), transform 0.15s var(--ease-out); }
+  .tbl tbody tr.row-link:hover .row-chev { color: var(--brand); transform: translateX(2px); }
+  .tbl tbody tr.row-major > * { background: var(--surface-2); border-bottom-color: transparent; }
+
+  /* ป้ายสถานะ */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    border-radius: 999px;
+    padding: 0.1875rem 0.6875rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .badge-good { background: var(--good-soft); color: var(--good); }
+  .badge-bad { background: var(--loss-soft); color: var(--loss-text); }
+  .badge-ok { background: var(--ok-soft); color: var(--ok); }
+  .badge-warn { background: var(--warn-soft); color: var(--warn-text); }
+  .badge-muted { background: var(--surface-2); color: var(--ink-3); }
+
+  /* แผงสรุปภายในการ์ด: พื้นสีอ่อน ไม่มีเส้นขอบ */
+  .panel { border-radius: var(--r-inner); padding: 0.875rem 1.125rem; background: var(--surface-2); }
+  .panel-good { background: var(--good-soft); }
+  .panel-bad { background: var(--loss-soft); }
+  .panel-warn { background: var(--warn-soft); }
+  .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  /* ===== แถบบน: โลโก้ · แท็บเม็ดยา · ผู้ใช้ ===== */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--surface);
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .topbar-in {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+  }
+  @media (min-width: 640px) { .topbar-in { padding: 0.75rem 1.75rem; } }
+  .brandmark { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+  .tabs {
+    order: 3;
+    display: flex;
+    gap: 0.25rem;
+    width: 100%;
+    margin: 0 -0.25rem;
+    padding: 0.125rem 0.25rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  @media (min-width: 1024px) {
+    .topbar-in { flex-wrap: nowrap; padding-block: 0.875rem; }
+    .tabs { order: 0; width: auto; margin: 0; overflow: visible; }
+  }
+  .tab {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    min-height: 2.5rem;
+    border-radius: 999px;
+    padding: 0.4375rem 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--ink-2);
+  }
+  .tab:hover { background: var(--surface-2); color: var(--ink); }
+  .tab[aria-current] { background: var(--pill); color: var(--pill-fg); font-weight: 600; }
+  /* เม็ดยาชิ้นเดียวที่เลื่อนไปหาแท็บที่เลือก (nav-link.tsx) — มีเม็ดยาแล้ว แท็บ active ไม่ต้องมีพื้นของตัวเอง */
+  .tabs { position: relative; }
+  .tab { position: relative; z-index: 1; }
+  .tab-pill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 999px;
+    background: var(--pill);
+    pointer-events: none;
+  }
+  .tabs[data-pill] .tab[aria-current] { background: transparent; }
+  .topbar-user { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    padding: 0.25rem 0.875rem 0.25rem 0.25rem;
+    max-width: 15rem;
+  }
+
+  /* โลโก้ M · อวตาร · ปุ่มไอคอน — ทุกอย่างกลม */
+  .logo-mark { display: block; flex-shrink: 0; overflow: visible; }
+  .avatar {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--pill-fg);
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  .icon-btn {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    color: var(--ink-3);
+  }
+  .icon-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .icon-btn-danger:hover { background: var(--loss-soft); color: var(--loss-text); }
+
+  /* ===== เส้นทาง (สัญลักษณ์ของธีม): สถานีบนเส้นหนา — ช่วงที่ผ่านมาเป็นแดง MSP สถานีปัจจุบันใหญ่ขึ้น ===== */
+  .route {
+    background: var(--surface);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 0.875rem 1rem 0.75rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    position: relative;
+  }
+  .route-list { display: flex; min-width: max-content; }
+  @media (min-width: 640px) { .route-list { min-width: 100%; } }
+  .stop {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 8.5rem;
+    text-align: center;
+  }
+  /* เส้นเชื่อมจากสถานีก่อนหน้า (ทุกสถานีกว้างเท่ากัน จึงวาดจาก -50% ถึงกลางตัวเองได้) */
+  .stop + .stop::before {
+    content: "";
+    position: absolute;
+    top: 0.75rem;
+    left: -50%;
+    right: 50%;
+    height: 6px;
+    margin-top: -3px;
+    border-radius: 6px;
+    background: var(--line-msp);
+  }
+  .stop[data-state="next"]::before { background: var(--route-off); }
+  .stop-link {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3125rem;
+    max-width: 100%;
+    border-radius: 14px;
+    padding: 0 0.5rem 0.125rem;
+  }
+  .stop-dot {
+    display: block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 5px solid var(--line-msp);
+    transition: transform 0.18s var(--ease);
+  }
+  .stop[data-state="now"] .stop-dot {
+    width: 2rem;
+    height: 2rem;
+    margin-top: -0.25rem;
+    border-width: 7px;
+    box-shadow: 0 0 0 5px color-mix(in srgb, var(--line-msp) 16%, transparent);
+  }
+  .stop[data-state="next"] .stop-dot { border-color: var(--route-off); }
+  .stop-label {
+    max-width: 14rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .stop-sub { margin-top: -0.25rem; font-size: 0.75rem; color: var(--ink-3); white-space: nowrap; }
+  .stop[data-state="now"] .stop-label { font-size: 0.875rem; font-weight: 700; color: var(--ink); }
+  .stop[data-state="next"] .stop-label { color: var(--ink-3); }
+  a.stop-link:hover .stop-label { color: var(--ink); text-decoration: underline; }
+  a.stop-link:hover .stop-dot { transform: scale(1.18); }
+
+  /* ===== สะพานกำไร (หน้า Overview): waterfall บนสายรถไฟ — แท่งยืนบนเส้น 0 · สถานีใต้แต่ละแท่ง · ปลายทาง = กำไรก่อนภาษี ===== */
+  .bridge-scroll { overflow-x: auto; scrollbar-width: thin; margin-inline: -0.5rem; padding-inline: 0.5rem; }
+  .bridge {
+    --gap: 0.875rem;
+    display: grid;
+    /* คอลัมน์กว้างพอสำหรับยอดบาทเต็ม 12 หลัก (จอแคบเลื่อนแนวนอนในการ์ด) */
+    grid-template-columns: repeat(7, minmax(7.75rem, 1fr));
+    gap: var(--gap);
+    margin-top: 1.25rem;
+    position: relative;
+  }
+  /* สายรถไฟใต้ทุกแท่ง: เส้นบาง 2px สีสาย MSP แบบจาง ผ่านกึ่งกลางสถานีแรกถึงสถานีสุดท้าย — เป็นฐานของกราฟ ไม่แย่งสายตาจากแท่ง */
+  .bridge::before {
+    content: "";
+    position: absolute;
+    left: calc((100% - 6 * var(--gap)) / 14);
+    right: calc((100% - 6 * var(--gap)) / 14);
+    top: calc(clamp(12rem, 30vh, 18rem) + 0.75rem);
+    height: 2px;
+    margin-top: -1px;
+    border-radius: 2px;
+    background: color-mix(in srgb, var(--line-msp) 40%, var(--line));
+  }
+  .bridge-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: var(--r-inner);
+    outline: none;
+  }
+  .bridge-plot { position: relative; width: 100%; height: clamp(12rem, 30vh, 18rem); }
+  /* พื้นที่แท่ง: เว้นหัว 1.75rem ให้ป้าย % ของแท่งสูงสุด · เว้นล่าง 1rem ให้แท่งเตี้ยไม่จมใต้สถานีปลายทาง (จุดใหญ่) */
+  .bridge-area { position: absolute; inset: 1.75rem 0 1rem; }
+  /* เส้น 0 เฉพาะงวดที่มีแท่งต่ำกว่า 0 (ขาดทุน) */
+  .bridge[data-below] .bridge-area::after {
+    content: "";
+    position: absolute;
+    left: -0.5rem;
+    right: -0.5rem;
+    bottom: var(--zero);
+    border-top: 1px solid var(--line-strong);
+  }
+  /* ยอดรวม = สีทึบ หัวโค้ง ยืนบนเส้น · รายการหัก = สีอ่อนของขั้นนั้น มีขอบบนสีเข้มบอกระดับที่เริ่มหัก */
+  .bridge-bar {
+    position: absolute;
+    left: 24%;
+    right: 24%;
+    min-height: 6px;
+    border-radius: 10px 10px 3px 3px;
+    background: var(--c);
+    transform-origin: 50% 100%;
+    transition: filter 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out);
+  }
+  .bridge-col[data-kind="less"] .bridge-bar {
+    border-radius: 4px;
+    background: color-mix(in srgb, var(--c) 26%, var(--surface));
+    box-shadow: inset 0 2px 0 var(--c);
+    transform-origin: 50% 0;
+  }
+  .bridge-col[data-neg] .bridge-bar { border-radius: 3px 3px 10px 10px; transform-origin: 50% 0; }
+  /* ป้าย % ของรายได้ลอยเหนือหัวแท่ง */
+  .bridge-tag {
+    position: absolute;
+    left: 0;
+    right: 0;
+    translate: 0 -0.375rem;
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink-2);
+    pointer-events: none;
+  }
+  .bridge-col[data-end] .bridge-tag { color: var(--c); font-size: 0.8125rem; }
+  .bridge-col[data-neg] .bridge-tag { color: var(--loss-text); }
+  /* เส้นบางเชื่อมระดับยอดไปยังสถานีถัดไป */
+  .bridge-link {
+    position: absolute;
+    left: 76%;
+    width: calc(48% + var(--gap));
+    border-top: 1px solid var(--line-strong);
+  }
+  /*
+   * สถานี = จุดเล็กสีของขั้นนั้นบนสาย (กล่องสูงเท่ากันทุกคอลัมน์ ป้ายใต้สถานีจึงตรงแนว)
+   * ยอดรวม = จุดทึบ · รายการหัก = จุดกลวงเล็กกว่า · ปลายทาง = จุดใหญ่สุดมีวงจาง · ขอบสีพื้นการ์ดตัดสายให้จุดลอยชัด
+   */
+  .bridge-stop {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: 0.75rem;
+    translate: 0 -50%;
+  }
+  .bridge-stop::before {
+    content: "";
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 999px;
+    background: var(--c);
+    box-shadow: 0 0 0 3px var(--surface);
+    transition: transform 0.18s var(--ease);
+  }
+  .bridge-col[data-kind="less"] .bridge-stop::before {
+    width: 0.5rem;
+    height: 0.5rem;
+    background: var(--surface);
+    border: 2px solid var(--c);
+  }
+  .bridge-col[data-end] .bridge-stop::before {
+    width: 0.875rem;
+    height: 0.875rem;
+    box-shadow: 0 0 0 3px var(--surface), 0 0 0 6px color-mix(in srgb, var(--c) 22%, var(--surface));
+  }
+  .bridge-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    margin-top: -0.25rem;
+    text-align: center;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--ink-2);
+  }
+  .bridge-label strong { font-size: 1rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+  .bridge-col[data-end] .bridge-label strong { font-size: 1.1875rem; }
+  .bridge-col[data-neg] .bridge-label strong { color: var(--loss-text); }
+  .bridge-tip {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    z-index: 2;
+    translate: -50% -0.25rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    background: var(--pill);
+    color: var(--pill-fg);
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: var(--shadow-pop);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s var(--ease-out), translate 0.16s var(--ease-out);
+  }
+  .bridge-col:first-child .bridge-tip { left: 0; translate: 0 -0.25rem; }
+  .bridge-col:last-child .bridge-tip { left: auto; right: 0; translate: 0 -0.25rem; }
+  .bridge-col:hover .bridge-tip, .bridge-col:focus-visible .bridge-tip { opacity: 1; translate: -50% -0.625rem; }
+  .bridge-col:first-child:hover .bridge-tip, .bridge-col:first-child:focus-visible .bridge-tip,
+  .bridge-col:last-child:hover .bridge-tip, .bridge-col:last-child:focus-visible .bridge-tip { translate: 0 -0.625rem; }
+  .bridge-col:hover .bridge-bar, .bridge-col:focus-visible .bridge-bar { filter: brightness(1.08) saturate(1.1); }
+  .bridge-col:hover .bridge-stop::before, .bridge-col:focus-visible .bridge-stop::before { transform: scale(1.3); }
+  .bridge-col:focus-visible { box-shadow: 0 0 0 2px var(--focus); }
+
+  /* จอแคบ: 7 สถานีครบในการ์ด — ยอดแบบย่อ (K/M) · ชื่อขึ้นบรรทัดใหม่ได้ · จอกว้าง: ยอดตามรูปแบบที่ผู้ใช้เลือก */
+  .bridge-compact { display: none; }
+  @media (max-width: 639px) {
+    .bridge { --gap: 0.25rem; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .bridge-full { display: none; }
+    .bridge-compact { display: inline; }
+    .bridge-label { font-size: 0.6875rem; }
+    .bridge-label strong, .bridge-col[data-end] .bridge-label strong { font-size: 0.75rem; letter-spacing: -0.02em; }
+    .bridge-name { overflow-wrap: anywhere; }
+    .bridge-bar { left: 14%; right: 14%; }
+    .bridge-tag, .bridge-col[data-end] .bridge-tag { font-size: 0.625rem; letter-spacing: -0.02em; }
+    .bridge-tip { display: none; }
+    /* ค่าใช้จ่ายที่ขยับ: ตัด % ทิ้ง เหลือชื่อ · แท่ง · ยอดบาท ให้พอดีจอ */
+    .movers .rank-badge { display: none; }
+  }
+
+  /* การเปลี่ยนเทียบงวดก่อน ใต้ % ของสถานี: ตัวเล็ก ไม่มีพื้น อยู่บนพื้นการ์ดเหมือนตัวเลขอื่นในป้าย */
+  .bridge-delta { font-size: 0.75rem; line-height: 1.35; }
+  .bridge-delta-amt { font-weight: 500; white-space: nowrap; }
+  @media (max-width: 639px) { .bridge-delta-amt { display: none; } }
+  /* จุดสถานีกลวงหน้าเดือนที่ใช้เทียบ — สไตล์เดียวกับจุดบนสาย */
+  .bridge-ref-stop {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    flex-shrink: 0;
+    border-radius: 999px;
+    border: 2px solid var(--ink-3);
+    background: var(--surface);
+  }
+  .summary-head { margin-bottom: 0.25rem; font-size: 0.8125rem; font-weight: 600; color: var(--ink); }
+
+  /* ===== กำไรก่อนภาษีรายเดือน: แท่งบนเส้น 0 — กำไรตั้งขึ้น ขาดทุนห้อยลงเป็นแดง ===== */
+  .mstrip-scroll { overflow-x: auto; scrollbar-width: thin; margin: 0.75rem -0.5rem 0; padding: 0 0.5rem 0.25rem; }
+  .mstrip { display: grid; grid-template-columns: repeat(12, minmax(6.25rem, 1fr)); gap: 0.375rem; }
+  /* จอแคบ: 12 เดือนเป็น 2 แถว แถวละ 6 เดือน ครบในการ์ด · ไม่แสดงยอด (ดูได้จากสะพานกำไรเมื่อเลือกเดือน) แต่เดือนขาดทุนยังมีป้าย */
+  @media (max-width: 639px) {
+    .mstrip { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.5rem 0.25rem; }
+    .mstrip-val { display: none; }
+    .mstrip .mstrip-plot { height: 3.5rem; }
+    .mstrip .mstrip-link { padding: 0.375rem 0 0.5rem; }
+    .mstrip .mstrip-badge { display: inline-flex; font-size: 0.625rem; padding-inline: 0.375rem; }
+    .mstrip .mstrip-plot::after { left: -0.125rem; right: -0.125rem; }
+  }
+  .mstrip-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.125rem;
+    border-radius: var(--r-inner);
+    padding: 0.5rem 0.25rem 0.625rem;
+    text-align: center;
+  }
+  .mstrip-plot { position: relative; display: block; width: 100%; height: 6.5rem; margin-bottom: 0.5rem; }
+  /* เส้น 0 ต่อกันเป็นเส้นเดียวตลอด 12 เดือน (ยื่นเข้าช่องว่างระหว่างเดือน) */
+  .mstrip-plot::after {
+    content: "";
+    position: absolute;
+    left: calc(-0.25rem - 0.1875rem);
+    right: calc(-0.25rem - 0.1875rem);
+    bottom: var(--zero);
+    border-top: 1px solid var(--line-strong);
+  }
+  /*
+   * สีเรียบ: เดือนอื่นเป็นแท่งเทาจาง · เดือนที่เลือกที่ตัวกรองเดือน = สีสายกำไรก่อนภาษี · ขาดทุน = แดงจาง ห้อยใต้เส้น
+   * สายตาจึงไปที่เดือนที่กำลังดูก่อน แล้วค่อยเห็นเดือนขาดทุน
+   */
+  .mstrip-bar {
+    position: absolute;
+    left: 30%;
+    right: 30%;
+    bottom: var(--zero);
+    border-radius: 6px 6px 2px 2px;
+    background: color-mix(in srgb, var(--ink-3) 26%, var(--surface));
+    transform-origin: 50% 100%;
+    transition: background-color 0.16s var(--ease-out);
+  }
+  .mstrip-month[data-state="now"] .mstrip-bar { background: var(--line-pbt); }
+  .mstrip-month[data-loss] .mstrip-bar {
+    bottom: auto;
+    top: calc(100% - var(--zero));
+    border-radius: 2px 2px 6px 6px;
+    background: color-mix(in srgb, var(--loss) 38%, var(--surface));
+    transform-origin: 50% 0;
+  }
+  .mstrip-month[data-loss][data-state="now"] .mstrip-bar { background: var(--loss); }
+  .mstrip-name { font-size: 0.8125rem; font-weight: 500; color: var(--ink-2); }
+  .mstrip-val { font-size: 0.75rem; color: var(--ink-3); white-space: nowrap; }
+  .mstrip-month[data-loss] .mstrip-val { color: var(--loss-text); font-weight: 600; }
+  .mstrip-month[data-state="now"] .mstrip-name { color: var(--ink); font-weight: 700; }
+  .mstrip-month[data-state="now"] .mstrip-val { color: var(--ink); font-weight: 600; }
+  .mstrip-month[data-loss][data-state="now"] .mstrip-val { color: var(--loss-text); }
+  .mstrip-month[data-state="off"] .mstrip-name, .mstrip-month[data-state="off"] .mstrip-val { color: var(--ink-3); }
+  /* ป้าย "ขาดทุน" ซ้ำกับยอดสีแดงมีเครื่องหมาย − บนจอกว้าง · แสดงเฉพาะจอแคบที่ซ่อนยอด */
+  .mstrip-badge { display: none; margin-top: 0.25rem; padding-block: 0.0625rem; font-size: 0.6875rem; }
+
+  /* ===== งบรายเดือนแบบชีต Monthy: ชื่อรายการติดซ้าย · เดือนที่เลือกเน้นทั้งคอลัมน์ ===== */
+  .matrix-scroll { overflow: auto; max-height: 42rem; scrollbar-width: thin; border-radius: var(--r-inner); overscroll-behavior: contain; }
+  /* ความกว้างคอลัมน์คงที่: ไม่ขึ้นกับข้อความที่แสดงอยู่ (สลับยอด/% เปลี่ยนเดือน แล้วตารางไม่ย่อขยาย)
+     --m-w/--s-w มาจาก MonthlyMatrix (ข้อความยาวสุดของยอดเงินแบบปกติและ %) · แบบทศนิยมใช้ --m-w-dec/--s-w-dec
+     คอลัมน์ชื่อรายการรับพื้นที่ที่เหลือ อย่างน้อย --name-w · กว้างไม่พอ = เลื่อนแนวนอนในการ์ด */
+  .matrix {
+    --name-w: 9rem;
+    --mw: var(--m-w);
+    --sw: var(--s-w);
+    width: 100%;
+    min-width: calc(var(--name-w) + var(--closed) * (var(--mw) + 1rem) + var(--open) * 2.5rem + var(--sw) + 1rem);
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.8125rem;
+  }
+  @media (min-width: 640px) { .matrix { --name-w: 13rem; } }
+  [data-money="decimal"] .matrix { --mw: var(--m-w-dec); --sw: var(--s-w-dec); }
+  /* สลับยอดเงิน / % ทันที: ทุกช่องมีทั้งสองค่า ซ่อนอันที่ไม่ได้เลือก (MatrixCard ตั้ง data-show) */
+  [data-show="amount"] .mx-pct, [data-show="pct"] .mx-amt { display: none; }
+  .matrix .matrix-col { width: calc(var(--mw) + 1rem); }
+  .matrix .matrix-col-off { width: 2.5rem; }
+  .matrix .matrix-col-sum { width: calc(var(--sw) + 1rem); }
+  .matrix th, .matrix td { padding: 0.4375rem 0.5rem; white-space: nowrap; }
+  .matrix thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    font-weight: 500;
+    text-align: right;
+  }
+  .matrix thead th:first-child { border-radius: 999px 0 0 999px; }
+  .matrix thead th:last-child { border-radius: 0 999px 999px 0; }
+  .matrix thead th[data-off] { color: var(--ink-3); font-weight: 400; }
+  .matrix thead th[data-now] { background: var(--pill); color: var(--pill-fg); font-weight: 600; }
+  .matrix td { text-align: right; color: var(--ink); border-bottom: 1px solid var(--line); }
+  .matrix .matrix-name {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: var(--surface);
+    text-align: left;
+    font-weight: 400;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 1px 0 0 var(--line);
+  }
+  .matrix thead .matrix-name { z-index: 3; background: var(--surface-2); color: var(--ink-2); font-weight: 500; box-shadow: none; }
+  .matrix .matrix-name[data-indent] { padding-left: 1.5rem; }
+  /* หัวข้อหมวด (รายได้ ต้นทุนขาย ค่าใช้จ่ายในการขาย …): ตัวหนาสีเข้ม · ตัวหนังสือติดซ้ายตอนเลื่อนแนวนอน (ช่อง colspan ทั้งแถวติดเองไม่ได้) */
+  .matrix tr.matrix-heading .matrix-name {
+    position: static;
+    padding-top: 1rem;
+    padding-bottom: 0.375rem;
+    overflow: visible;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--ink);
+    box-shadow: none;
+    border-bottom-color: var(--line-strong);
+  }
+  .matrix-heading-text { position: sticky; left: 0.5rem; display: inline-block; }
+  .matrix tr[data-total] > * { font-weight: 500; }
+  .matrix tr[data-major] > * { background: var(--surface-2); font-weight: 600; color: var(--navy); }
+  .matrix td[data-now] { background: color-mix(in srgb, var(--brand) 7%, var(--surface)); }
+  .matrix tr[data-major] td[data-now] { background: color-mix(in srgb, var(--brand) 12%, var(--surface-2)); }
+  .matrix td[data-sum] { font-weight: 600; box-shadow: inset 1px 0 0 var(--line-strong); }
+  .matrix td[data-neg] { color: var(--loss-text); font-weight: 600; }
+  /*
+   * ชี้ช่อง = ไฮไลต์แถวแนวนอน + คอลัมน์แนวตั้ง (เดือน 2–13 · รวม 14) และหัวคอลัมน์ · ช่องที่ชี้อยู่ (จุดตัด) เข้มกว่า
+   * คอลัมน์ชื่อรายการ (ลูกที่ 1) และแถวหัวข้อ (colspan) ไม่ร่วม · หัวเดือนที่เลือก (data-now) คงสีเข้มเดิม
+   */
+  @media (hover: hover) and (pointer: fine) {
+    .matrix tbody tr:not(.matrix-heading):hover > * { background-color: var(--brand-soft); }
+    /* ช่องของคอลัมน์ที่ชี้ — MatrixCard ติด data-hcol ให้เฉพาะช่องในคอลัมน์นั้น (ไม่ใช้ :has — ช้ามากกับตารางหลายร้อยช่อง) */
+    /* !important: ทับพื้นแถวยอดรวม (data-major) และคอลัมน์เดือนที่เลือก (data-now) แบบเดิม · หัวเดือนที่เลือกกับจุดตัดด้านล่างยังชนะ */
+    .matrix tr > [data-hcol] { background-color: var(--brand-soft) !important; }
+    .matrix thead th[data-now] { background-color: var(--pill) !important; }
+    .matrix tbody tr:not(.matrix-heading) > td:hover { background-color: color-mix(in srgb, var(--brand) 18%, var(--brand-soft)) !important; }
+  }
+
+  /* ===== ปุ่ม/ช่องกรอก: เม็ดยาทั้งหมด ===== */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    background: var(--btn);
+    color: var(--btn-fg);
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    transition: background-color 0.16s var(--ease);
+  }
+  .btn-primary:hover { background: var(--btn-hover); }
+  .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+  /* ปุ่มรอง: เม็ดยาสีพื้น */
+  .btn-soft {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    padding: 0.375rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .btn-soft:hover { background: var(--surface-3); color: var(--ink); }
+
+  .field {
+    width: 100%;
+    min-height: 2.75rem;
+    border: 1px solid transparent;
+    background: var(--surface-2);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 0.5625rem 1.125rem;
+    transition: border-color 0.16s var(--ease), box-shadow 0.16s var(--ease), background-color 0.16s var(--ease);
+  }
+  .field::placeholder { color: var(--ink-3); }
+  .field:hover { border-color: var(--line-strong); }
+  .field:focus-visible {
+    outline: none;
+    border-color: var(--brand);
+    background: var(--surface);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--brand) 16%, transparent);
+  }
+  select.field, .select {
+    appearance: none;
+    padding-right: 2.5rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23646b7b' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+  }
+  /* ตัวเลือกบนหัวหน้า (งวด/หน่วย): เม็ดยาขาวบนพื้นเทา */
+  .select {
+    min-height: 2.75rem;
+    border-radius: 999px;
+    background-color: var(--surface);
+    box-shadow: var(--shadow);
+    color: var(--ink);
+    padding: 0.5rem 2.5rem 0.5rem 1.125rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .select:hover { background-color: var(--surface-2); }
+
+  /* แท็บเลือกแบบเม็ดยา */
+  .seg {
+    display: inline-flex;
+    gap: 0.125rem;
+    background: var(--surface);
+    border-radius: 999px;
+    padding: 0.25rem;
+    box-shadow: var(--shadow);
+  }
+  .card .seg { background: var(--surface-2); box-shadow: none; }
+  .seg > * {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    border-radius: 999px;
+    padding: 0.375rem 0.9375rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--ink-2);
+    transition: background-color 0.16s var(--ease), color 0.16s var(--ease);
+  }
+  .seg > *:hover { color: var(--ink); }
+  .seg > [aria-current] {
+    background: var(--pill);
+    color: var(--pill-fg);
+    font-weight: 600;
+  }
+
+  /* เหรียญ 100 บาท: 20 เหรียญต่อแถว (จอแคบ 10) เหรียญละ 1 บาท */
+  .coins {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 0.375rem;
+    max-width: 40rem;
+  }
+  @media (min-width: 640px) { .coins { grid-template-columns: repeat(20, minmax(0, 1fr)); } }
+  .coin {
+    aspect-ratio: 1;
+    border-radius: 999px;
+    transition: opacity 0.16s var(--ease), transform 0.16s var(--ease);
+  }
+  .coin[data-dim] { opacity: 0.18; }
+  .coin[data-over] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--loss); }
+
+  /* ช่องเดือนในป๊อปเลือกงวด */
+  .month-cell {
+    position: relative;
+    min-height: 2.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: background-color 0.16s var(--ease), color 0.16s var(--ease), transform 0.2s var(--ease);
+  }
+  .month-cell:disabled { cursor: not-allowed; }
+  .month-cell:active:not(:disabled) { transform: scale(0.94); }
+
+  /* แถบเปรียบเทียบแนวนอน */
+  .track { height: 0.625rem; background: var(--surface-3); border-radius: 999px; overflow: hidden; }
+
+  .money-roll { display: inline-block; }
+
+  .skel {
+    background: var(--surface-3);
+    border-radius: 999px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .tbl tbody tr:hover > * { background-color: var(--surface-2); }
+    .tbl tbody tr.row-on:hover > * { background-color: var(--brand-soft); }
   }
 }
+
+/* .swap: ข้อความหลายแบบวางซ้อนในช่องเดียว ขนาดเท่าข้อความที่ยาวที่สุดเสมอ แสดงเฉพาะตัวที่ data-on (ปุ่มไม่ยืดหดตามสถานะ) */
+.swap { display: inline-grid; }
+.swap > * { grid-area: 1 / 1; }
+.swap > :not([data-on]) { visibility: hidden; }
+.swap-block { display: grid; }
+.swap-block > * { grid-area: 1 / 1; }
+.swap-block > :not([data-on]) { visibility: hidden; }
+
+@keyframes skel-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* skeleton: จางเข้าหลังหน่วง 120ms (โหลดเร็วจะไม่เห็น) แล้วนิ่ง — แท่งไม่กะพริบ */
+  .skel-page { animation: skel-in 0.24s 0.12s cubic-bezier(0.22, 0.61, 0.36, 1) both; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stop-dot { transition: none; }
+  a.stop-link:hover .stop-dot { transform: none; }
+}
+
+/* ===== Motion =====
+   จังหวะเดียวทั้งระบบ: ชะลอตัวแบบ ease-out-expo · ตอบสนอง 120–160ms · เปลี่ยนสถานะ 200–300ms · ช่วงเด่น ≤ 900ms
+   ช่วงเด่นของธีม = "รถไฟวิ่งเข้าสถานี": เส้นทางแดงลากจากสถานีแรกไปสถานีปัจจุบันทุกครั้งที่เข้า/เจาะลงหน่วย
+   ทุกอย่างมองเห็นได้ตั้งแต่แรกถ้าอนิเมชันไม่ทำงาน · ลดการเคลื่อนไหว = เหลือแค่จางเข้า ไม่มีการขยับ */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ตอบสนองการกด: ปุ่ม แท็บ เม็ดยา ยุบเล็กน้อยตอนกด แล้วคืนตัวนุ่มๆ */
+.tab, .seg > *, .btn-primary, .btn-soft, .icon-btn, .drop-cta, .select {
+  transition: background-color 0.16s var(--ease-out), color 0.16s var(--ease-out), box-shadow 0.16s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.tbl tbody tr > * { transition: background-color 0.12s var(--ease-out); }
+.stop-label { transition: color 0.16s var(--ease-out); }
+
+@keyframes enter-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes enter-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes route-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+@keyframes stop-arrive {
+  0% { scale: 0.3; opacity: 0; }
+  60% { opacity: 1; }
+  100% { scale: 1; opacity: 1; }
+}
+@keyframes stop-ring {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--line-msp) 45%, transparent); }
+  to { box-shadow: 0 0 0 5px color-mix(in srgb, var(--line-msp) 16%, transparent); }
+}
+@keyframes bar-reveal {
+  from { clip-path: inset(0 100% 0 0 round 999px); }
+  to { clip-path: inset(0 0 0 0 round 999px); }
+}
+@keyframes bridge-grow {
+  from { transform: scaleY(0); opacity: 0.4; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes line-draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tab:active, .seg > *:active, .btn-primary:active:not(:disabled), .btn-soft:active, .icon-btn:active, .drop-cta:active {
+    transform: scale(0.96);
+    transition-duration: 0.08s;
+  }
+
+  /* เนื้อหาหน้าแทน skeleton: ทีละบล็อกจากบนลงล่าง หน่วงรวมไม่เกิน 240ms */
+  /* backwards (ไม่ใช่ both): พอจบแล้วไม่ค้าง transform ไว้ บล็อกจึงไม่กลายเป็น stacking context ที่ทับป๊อปอัปของบล็อกก่อนหน้า */
+  .page-host > div:not(.skel-page) > * { animation: enter-rise 0.42s var(--ease-out) backwards; }
+  .page-host > div:not(.skel-page) > :nth-child(2) { animation-delay: 40ms; }
+  .page-host > div:not(.skel-page) > :nth-child(3) { animation-delay: 80ms; }
+  .page-host > div:not(.skel-page) > :nth-child(4) { animation-delay: 120ms; }
+  .page-host > div:not(.skel-page) > :nth-child(5) { animation-delay: 160ms; }
+  .page-host > div:not(.skel-page) > :nth-child(6) { animation-delay: 200ms; }
+  .page-host > div:not(.skel-page) > :nth-child(n + 7) { animation-delay: 240ms; }
+
+  /* KPI เรียงเข้าทีละใบ (เป็นรายการจริง) */
+  .page-host > div:not(.skel-page) .kpi { animation: enter-rise 0.42s var(--ease-out) backwards; animation-delay: calc(120ms + var(--k, 0) * 50ms); }
+  .kpi:nth-child(2) { --k: 1; }
+  .kpi:nth-child(3) { --k: 2; }
+  .kpi:nth-child(4) { --k: 3; }
+
+  /* ช่วงเด่น: เส้นทางลากไปทีละสถานี แล้วสถานีปัจจุบันเด้งรับพร้อมวงแหวน */
+  .stop + .stop::before {
+    transform-origin: left center;
+    animation: route-draw 0.32s var(--ease-out) both;
+    animation-delay: calc(180ms + (var(--i, 1) - 1) * 130ms);
+  }
+  .stop .stop-dot {
+    animation: stop-arrive 0.36s var(--ease-out) both;
+    animation-delay: calc(180ms + var(--i, 0) * 130ms);
+  }
+  .stop[data-state="now"] .stop-dot {
+    animation: stop-arrive 0.42s var(--ease-out) both, stop-ring 0.9s var(--ease-out) both;
+    animation-delay: calc(180ms + var(--i, 0) * 130ms), calc(300ms + var(--i, 0) * 130ms);
+  }
+  .stop[data-state="next"]::before { animation-duration: 0.24s; }
+
+  /* สะพานกำไร: แท่งงอกขึ้นจากสายทีละสถานี ตามทางที่รถไฟวิ่ง แล้วสถานีปลายทางเด้งรับ */
+  .bridge-bar { animation: bridge-grow 0.2s var(--ease-out) backwards; animation-delay: calc(60ms + var(--i, 0) * 30ms); }
+  .bridge-col[data-end] .bridge-stop::before { animation: stop-arrive 0.2s var(--ease-out) backwards; animation-delay: 260ms; }
+  .mstrip-bar { animation: bridge-grow 0.2s var(--ease-out) backwards; animation-delay: 80ms; }
+
+  /* แถบสัดส่วน/อันดับ: เติมจากซ้ายไปขวา (clip-path ไม่บิดมุมโค้งเหมือน scaleX) */
+  .bar-fill { animation: bar-reveal 0.7s var(--ease-out) both; animation-delay: 160ms; }
+
+  /* เหรียญ 100 บาท: หยอดทีละเหรียญตามลำดับ รวมไม่เกิน ~0.8 วินาที */
+  .coin { animation: stop-arrive 0.32s var(--ease-out) both; animation-delay: calc(120ms + var(--n, 0) * 6ms); }
+
+  /* กราฟแนวโน้ม: ลากเส้นจากงวดแรกไปงวดล่าสุด แล้วจุดสถานีปรากฏ */
+  .trend-line { stroke-dasharray: 1; animation: line-draw 0.8s var(--ease-out) both; animation-delay: 120ms; }
+  .trend-dots { animation: enter-fade 0.3s var(--ease-out) both; animation-delay: 620ms; }
+
+  /* เมนูบน: เม็ดยาไหลไปหาแท็บที่กด (เลื่อน + ยืดหดตามความกว้างแท็บ) · ตัวอักษรแท็บใหม่เปลี่ยนสีตามหลังเล็กน้อย ให้ขาวตอนเม็ดยาไปถึง */
+  .tab-pill[data-animate] { transition: transform 0.36s var(--ease-out), width 0.36s var(--ease-out); }
+  .tabs[data-pill] .tab[aria-current] { transition: color 0.2s var(--ease-out) 0.1s, transform 0.2s var(--ease-out); }
+
+  /* ป๊อปอัป / tooltip / กล่องตัวกรอง */
+  .pop-in { animation: pop-in 0.18s var(--ease-out) both; transform-origin: top center; }
+
+  /* รายละเอียดหน่วยที่เพิ่งเปิด */
+  .reveal { animation: enter-rise 0.36s var(--ease-out) backwards; }
+
+  /* สลับรูปแบบตัวเลข (ปกติ/ทศนิยม/ย่อ): ตัวเลขจางเข้าพร้อมเลื่อนขึ้นเล็กน้อย */
+  .money-roll { animation: enter-rise 0.24s var(--ease-out) both; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-host > div:not(.skel-page) > *, .reveal, .pop-in, .money-roll { animation: enter-fade 0.2s linear both; }
+}
+
+/* ===== หน้านำเข้าข้อมูล ===== */
+/* ขั้นตอน: เลือกไฟล์ → ตรวจยอด → นำเข้า · วาดเป็นสถานีบนเส้นทาง ช่วงที่ผ่านแล้วเป็นแดง MSP */
+.steps { display: flex; align-items: center; gap: 0.625rem; }
+.steps > li { display: flex; flex: 1 1 0; align-items: center; gap: 0.625rem; min-width: 0; }
+.steps > li:last-child { flex: none; }
+.steps > li:not(:last-child)::after {
+  content: "";
+  flex: 1;
+  height: 6px;
+  min-width: 1rem;
+  border-radius: 6px;
+  background: linear-gradient(var(--line-msp), var(--line-msp)) no-repeat left / 0% 100%, var(--route-off);
+}
+.steps > li[data-state="done"]::after { background-size: 100% 100%, auto; }
+.step-dot {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 999px;
+  border: 5px solid var(--route-off);
+  background: var(--surface);
+  color: transparent;
+  font-size: 0;
+}
+.step-dot svg { display: none; }
+.step-label { font-size: 0.8125rem; font-weight: 500; color: var(--ink-3); white-space: nowrap; }
+.steps > li[data-state="current"] .step-dot { border-color: var(--line-msp); border-width: 7px; box-shadow: 0 0 0 5px color-mix(in srgb, var(--line-msp) 16%, transparent); }
+.steps > li[data-state="current"] .step-label { color: var(--ink); font-weight: 700; }
+.steps > li[data-state="done"] .step-dot { border-color: var(--line-msp); }
+.steps > li[data-state="done"] .step-label { color: var(--ink-2); }
+@media (max-width: 479px) {
+  .steps > li:not([data-state="current"]) .step-label { display: none; }
+}
+
+/* พื้นที่วางไฟล์ */
+.drop {
+  display: flex;
+  cursor: pointer;
+  border: 2px dashed var(--line-strong);
+  border-radius: 24px;
+  background: var(--surface-2);
+  transition: border-color 0.16s var(--ease), background-color 0.16s var(--ease);
+}
+.drop:hover { border-color: var(--ink-3); }
+.drop[data-drag] { border-color: var(--brand); border-style: solid; background: var(--brand-soft); }
+.drop-input:focus-visible + .drop { outline: 2px solid var(--focus); outline-offset: 2px; }
+.drop-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+.drop[data-drag] .drop-icon { background: var(--brand); color: #fff; }
+.drop-cta {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--pill);
+  padding: 0.5rem 1.125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--pill-fg);
+}
+.drop:hover .drop-cta { background: var(--btn-hover); }
+
+/* แถบความคืบหน้าใต้ชื่อไฟล์: busy = วิ่งไปมา · full = เต็ม · error = แดงเต็ม */
+.progress { display: block; height: 6px; border-radius: 6px; background: var(--surface-3); overflow: hidden; }
+.progress > i { display: block; height: 100%; width: 100%; border-radius: inherit; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+.progress[data-state="full"] > i { transform: scaleX(1); background: var(--good); }
+.progress[data-state="error"] > i { transform: scaleX(1); background: var(--loss); }
+.progress[data-state="busy"] > i { width: 40%; transform: none; }
+
+/* รายการสิ่งที่ควรตรวจ */
+.issues { border-radius: var(--r-inner); background: var(--surface-2); overflow: clip; }
+.issues > li + li { border-top: 1px solid var(--line); }
+.issue-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.125rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+.issue-dot { width: 0.625rem; height: 0.625rem; flex-shrink: 0; border-radius: 999px; background: var(--ink-3); }
+.issue-dot[data-tone="bad"] { background: var(--loss); }
+.issue-dot[data-tone="warn"] { background: var(--warn); }
+
+/* ป้ายมีจุดสีนำหน้า */
+.badge-dot::before { content: ""; width: 0.375rem; height: 0.375rem; border-radius: 999px; background: currentColor; }
+
+@keyframes progress-run {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .progress[data-state="busy"] > i { animation: progress-run 1.1s cubic-bezier(0.22, 0.61, 0.36, 1) infinite; }
+}
+
+/* ===== หน้า Login: โต๊ะทำงานยามค่ำ — ผนังกระดาษกราฟ โต๊ะไม้ โคมไฟตั้งโต๊ะแขนสปริง ดึงสายเพื่อเปิดไฟ (login/lamp-login.tsx) =====
+   ห้องมืดทั้งสองธีม (ฉากกำหนดความสว่างเอง ไม่ตามธีมเครื่อง) · การ์ดใช้สีชุดสว่างของตัวเองเสมอ
+   ผัง (grid 3 แถว): ที่ว่างเหนือการ์ดสำหรับหัวโคม · การ์ดตั้งบนโต๊ะ · โต๊ะ
+   ตำแหน่งโคม (ฐาน แขน ข้อต่อ หัวโคม ลำแสง สายดึง) คำนวณใน login/lamp-engine.ts จากตำแหน่งการ์ดและขอบโต๊ะ
+   ลำดับชั้น: ผนัง 0 · แสงบนผนัง 1 · โต๊ะ 2 · ขอบห้องมืด 3 · กระดานชอล์ก ชั้นหนังสือ และของบนโต๊ะ 4 · ความมืด 5 · โคม 6 · การ์ด 8 · สาย 9 · ลูกปัด คำชวน ไส้หลอด 10 */
+html:has(.lamp-room),
+html:has(.lamp-room) body {
+  background: #0c0c0e;
+  color-scheme: dark;
+}
+.lamp-room {
+  --desk-h: clamp(64px, 12svh, 128px);
+  /* จอกว้าง: เลื่อนการ์ดไปทางขวา ให้โคมกับการ์ดรวมกันอยู่กลางจอ */
+  --card-shift: 0px;
+  --bead-h: 28px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  /* คอลัมน์เดียว: การ์ดกับคำชวนซ้อนอยู่ช่องเดียวกัน (ทุกชิ้นระบุ grid-column: 1 ไม่ให้ grid สร้างคอลัมน์เพิ่มเอง) */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(9rem, 1fr) auto var(--desk-h);
+  min-height: 100svh;
+  overflow: clip;
+  background: #0c0c0e;
+}
+@media (min-width: 640px) { .lamp-room { --card-shift: 70px; } }
+@media (min-width: 1024px) { .lamp-room { --card-shift: 120px; } }
+
+/* ผนังกระดาษกราฟ: ช่องย่อย 16px · เส้นหลักทุก 5 ช่อง */
+.lamp-wall {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #f2efe6;
+  background-image:
+    linear-gradient(rgba(47, 108, 145, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 108, 145, 0.3) 1px, transparent 1px),
+    linear-gradient(rgba(47, 108, 145, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 108, 145, 0.12) 1px, transparent 1px);
+  background-size: 80px 80px, 80px 80px, 16px 16px, 16px 16px;
+}
+/* แสงโคมบนผนัง (ศูนย์กลาง = ปากโคม --glow-x/--glow-y จาก lamp-engine.ts) · ขอบห้องมืดลงตามระยะห่างจากโคม */
+.lamp-wall-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--glow-x, 40%) var(--glow-y, 30%), rgba(255, 204, 136, 0.34), rgba(255, 196, 120, 0.1) 32%, transparent 60%);
+}
+.lamp-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(ellipse 72% 85% at var(--glow-x, 40%) calc(var(--glow-y, 30%) + 16%), transparent 38%, rgba(34, 22, 12, 0.52) 100%);
+}
+
+/* ส่วนที่สว่างเมื่อเปิดไฟ: ติดพร้อมกระพริบแบบหลอดเพิ่งติด (keyframes ท้ายส่วนนี้) · ปิดแล้วดับตามเวลา --off ของแต่ละชิ้น */
+.lamp-room [data-lit] { opacity: 0; transition: opacity var(--off, 0.45s) ease-in; }
+.lamp-room[data-light="on"] [data-lit] { opacity: 1; transition: none; }
+.lamp-head [data-lit] { --off: 0.16s; }
+.lamp-glow { --off: 0.3s; }
+/* ความมืดของห้อง: คลุมผนังและโต๊ะ (โคมอยู่เหนือชั้นนี้และหรี่ด้วย filter ของตัวเอง) · เส้นกราฟยังเห็นจางๆ */
+.lamp-night {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: #0b0b0d;
+  opacity: 0.93;
+  transition: opacity 0.5s ease-in;
+}
+.lamp-room[data-light="on"] .lamp-night { opacity: 0; transition: none; }
+
+/* โต๊ะไม้: ผิวบน (มองจากสูงกว่าโต๊ะเล็กน้อย) + ขอบและหน้าโต๊ะ · วงแสงจากโคมตกบนผิวโต๊ะ */
+.lamp-desk {
+  grid-row: 3;
+  grid-column: 1;
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(#5b3d28, #3a2619 70%, #2c1d13);
+}
+.lamp-desk::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 26px;
+  background: linear-gradient(#80603f, #6a4a32);
+  box-shadow: 0 2px 0 rgba(255, 214, 170, 0.2), 0 7px 10px -4px rgba(0, 0, 0, 0.5);
+}
+.lamp-desk-pool {
+  position: absolute;
+  left: var(--pool-x, 50%);
+  top: -6px;
+  width: 760px;
+  height: 44px;
+  margin-left: -380px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 214, 150, 0.5), rgba(255, 200, 130, 0.12) 60%, transparent);
+}
+
+/* ของบนผนัง (จอ ≥1360px เท่านั้น): กระดานชอล์กฝั่งซ้าย (ขอบบนสูงกว่าการ์ด 1rem) · ชั้นหนังสือฝั่งขวาของการ์ด (ขอบบนต่ำกว่าการ์ด 1rem)
+   วางแบบ absolute จากตำแหน่งที่ lamp-engine.ts วัดได้ (--card-left --card-top --desk-top) ไม่ดันผังการ์ด · ซ่อนจนกว่าจะวางผังเสร็จ
+   ไม่เรืองแสงเอง: อยู่ใต้ชั้นความมืด ห้องมืดก็มืดตาม
+
+   กระดานชอล์ก (login/chalk-board.tsx): ขอบขวาห่างการ์ด 2rem — แขนโคม (ชั้นบนกว่า) พาดหน้ากระดาน
+   ขอบบนสูงกว่าการ์ด 1rem: ลูกปัดสายดึง (ปลายล่างอยู่เหนือการ์ดราว 2rem) ยังห้อยอยู่เหนือขอบบนกระดาน
+   กว้างได้ถึงขอบจอซ้าย 2.5rem สูงสุด 52rem · กระดาน 3:2 (viewBox ของกราฟ) จึงสูงตามความกว้าง — ถ้าที่ว่างเหนือโต๊ะไม่พอ ความกว้างย่อตามความสูงที่เหลือ
+   (กรอบ 10px สองข้าง · รางชอล์กยื่นใต้กรอบ 8px · เว้นเหนือโต๊ะอย่างน้อย 3rem) · เปิดไฟแล้วกราฟชอล์กเขียนตัวเองครั้งเดียว */
+.chalk-board {
+  position: absolute;
+  right: calc(100% - var(--card-left, 0px) + 2rem);
+  top: calc(var(--card-top, 0px) - 1rem);
+  z-index: 4;
+  display: none;
+  width: clamp(0px, min(calc(var(--card-left, 0px) - 4.5rem), calc((var(--desk-top, 0px) - var(--card-top, 0px) - 2rem - 28px) * 3 / 2 + 20px)), 52rem);
+  padding: 10px;
+  border-radius: 6px;
+  /* กรอบไม้โอ๊ก: สว่างที่มุมขวาบน ด้านที่หันเข้าหาโคม */
+  background: linear-gradient(225deg, #c99b64, #a87542 45%, #875a2f);
+  box-shadow: inset 0 0 0 1px rgba(255, 230, 190, 0.22), inset 0 -2px 0 rgba(0, 0, 0, 0.18), 0 22px 30px -14px rgba(26, 16, 8, 0.55);
+}
+@media (min-width: 1360px) { .chalk-board { display: block; } }
+/* กระดานดำโทนเขียว: แสงโคมตกจากทางขวา (โคมอยู่ขวาของกระดาน) · คราบฝุ่นชอล์กจางๆ จากการลบ */
+.chalk-slate {
+  border-radius: 3px;
+  background:
+    radial-gradient(60% 55% at 88% 10%, rgba(255, 214, 160, 0.09), transparent 70%),
+    radial-gradient(42% 30% at 68% 62%, rgba(255, 255, 255, 0.05), transparent 70%),
+    radial-gradient(34% 26% at 30% 82%, rgba(255, 255, 255, 0.035), transparent 70%),
+    #1f2a25;
+  box-shadow: inset 0 2px 7px rgba(0, 0, 0, 0.55);
+}
+.chalk-chart { display: block; width: 100%; height: auto; }
+.chalk-chart text { font-family: var(--font-body), system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.chalk-grid { stroke: rgba(241, 239, 230, 0.16); stroke-width: 0.9; stroke-dasharray: 2 5; }
+.chalk-axis { fill: none; stroke: #f1efe6; stroke-opacity: 0.85; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; }
+.chalk-label { font-size: 8.5px; fill: #f1efe6; fill-opacity: 0.82; }
+.chalk-candle { transform-box: fill-box; transform-origin: 50% 100%; }
+.chalk-candle line { stroke-width: 1.1; }
+.chalk-candle rect { stroke-width: 1; fill-opacity: 0.42; }
+.chalk-last-line { stroke: #f5df86; stroke-width: 1.1; stroke-dasharray: 5 4; }
+.chalk-last-box { fill: none; stroke: #f5df86; stroke-width: 1.2; }
+.chalk-last-text { font-size: 8.5px; font-weight: 600; fill: #f5df86; }
+/* รางไม้ใต้กระดาน: ชอล์กหนึ่งแท่งกับแปรงลบวางอยู่บนราง */
+.chalk-tray {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  bottom: -8px;
+  height: 9px;
+  border-radius: 3px;
+  background: linear-gradient(#bf8f56, #875a2f);
+  box-shadow: 0 5px 7px -3px rgba(0, 0, 0, 0.45);
+}
+.chalk-stick {
+  position: absolute;
+  left: 16%;
+  bottom: calc(100% - 2px);
+  width: 24px;
+  height: 5px;
+  border-radius: 2px;
+  background: linear-gradient(#fbf8f0, #e4ded0);
+}
+.chalk-eraser {
+  position: absolute;
+  right: 14%;
+  bottom: calc(100% - 2px);
+  width: 36px;
+  height: 11px;
+  border-radius: 2px;
+  /* ด้ามไม้ด้านบน · สักหลาดด้านล่างเปื้อนฝุ่นชอล์ก */
+  background: linear-gradient(#a57643 0 46%, #46484d 46%, #5a5c61);
+}
+
+/* ชั้นหนังสือ (login/bookshelf.tsx): ที่เดิมของกระดาน — ห่างขอบขวาการ์ด 3rem ถึงก่อนขอบจอ 3rem สูงสุด 26rem
+   ภาพ 320×300 สูงตามความกว้าง · ที่ว่างเหนือโต๊ะไม่พอก็ย่อตาม (เว้นเหนือโต๊ะ 1.5rem) */
+.bookshelf {
+  position: absolute;
+  left: calc(50% + var(--card-shift) + 15rem);
+  top: calc(var(--card-top, 0px) + 1rem);
+  z-index: 4;
+  display: none;
+  width: clamp(0px, min(calc(50% - var(--card-shift) - 18rem), calc((var(--desk-top, 0px) - var(--card-top, 0px) - 2.5rem) * 16 / 15)), 26rem);
+  pointer-events: none;
+}
+@media (min-width: 1360px) { .bookshelf { display: block; } }
+.bookshelf-art { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* ของบนโต๊ะ (login/desk-decor.tsx, จอ ≥1360px): ชุดขวาห่างขอบขวาการ์ด 1.5rem · ชุดซ้ายห่างขอบซ้ายฐานโคม 1.5rem
+   ขอบล่างของภาพ (ก้นของ) อยู่บนผิวโต๊ะ ลึกจากขอบบนโต๊ะ 16px · ขนาดตามโคม (--lamp-s) แต่ไม่เกินที่ว่างถึงขอบจอ (เว้น 1.5rem)
+   อยู่ชั้นเดียวกับของบนผนังแต่วาดทีหลัง: ของบนโต๊ะอยู่หน้ากระดาน · ไม่เรืองแสงเอง จึงมืดไปพร้อมห้อง */
+.desk-decor {
+  position: absolute;
+  bottom: calc(100% - var(--desk-top, 0px) - 16px);
+  z-index: 4;
+  display: none;
+  pointer-events: none;
+}
+.desk-decor svg { display: block; width: 100%; height: auto; overflow: visible; }
+.desk-decor-right {
+  left: calc(var(--card-right, 0px) + 1.5rem);
+  width: min(calc(384px * var(--lamp-s, 1)), calc(100% - var(--card-right, 0px) - 3rem));
+}
+.desk-decor-left {
+  right: calc(100% - var(--base-left, 0px) + 1.5rem);
+  width: min(calc(300px * var(--lamp-s, 1)), calc(var(--base-left, 0px) - 3rem));
+}
+@media (min-width: 1360px) { .desk-decor { display: block; } }
+/* จอแล็ปท็อป: ดับ (กระจกดำ) ตอนห้องมืด · ไฟติดแล้วจอตื่นตามมาหลังหลอดไฟกระพริบเสร็จ */
+.decor-screen { opacity: 0; transition: opacity 0.2s ease-in; }
+.decor-ui { font-family: var(--font-body), system-ui, sans-serif; }
+.lamp-room[data-light="on"] .decor-screen { opacity: 1; transition: opacity 0.45s ease-out 1.1s; }
+/* ไอร้อนจากแก้วกาแฟ: เส้นขาวมีเงาขอบจางให้เห็นบนผนังสีอ่อน · ลอยขึ้นแล้วจางเมื่อเปิดไฟ (keyframes ท้ายส่วนนี้) */
+.decor-steam { filter: drop-shadow(0 0 1.2px rgba(80, 60, 40, 0.45)); }
+.decor-steam path { stroke: #fffaf0; stroke-width: 2.4; opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; }
+/* นาฬิกาปลุกสั่นรอบฐาน (ระหว่างขาสองข้าง) · ค้อนกริ่งแกว่งรอบโคนค้อน */
+.decor-clock,
+.decor-hammer { transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* โคม: หรี่เป็นเงาหม่นตอนห้องมืด · ซ่อนจนกว่า lamp-engine.ts จะวางผังเสร็จ (data-ready) */
+.lamp-fixture {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  filter: brightness(0.36) saturate(0.85);
+  transition: filter 0.7s var(--ease);
+}
+.lamp-room[data-light="on"] .lamp-fixture { filter: none; }
+.lamp-room:not([data-ready]) :is(.lamp-fixture, .lamp-cord-line, .lamp-bead, .lamp-ember, .chalk-board, .bookshelf, .desk-decor) { visibility: hidden; }
+/* ชั้นที่หมุนตามหัวโคม (จุดหมุน = ข้อต่อท้ายหัวโคม): ตัวหัวโคม · ลำแสงกับฝุ่น */
+.lamp-head-rig {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+.lamp-head { position: absolute; left: -22px; top: -62px; overflow: visible; }
+.lamp-glow {
+  position: absolute;
+  left: -62px;
+  top: -150px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 214, 0.75) 0, rgba(255, 220, 160, 0.3) 22%, rgba(255, 190, 120, 0.1) 45%, transparent 68%);
+}
+/* ลำแสงทรงกรวยจากปากโคม: กรวยกว้าง + แกนสว่าง เบลอขอบให้นุ่ม (อยู่หลังการ์ด — การ์ดสว่างด้วยไล่สีของตัวเอง) */
+.lamp-beam,
+.lamp-motes {
+  position: absolute;
+  left: 84px;
+  top: -560px;
+  width: 1000px;
+  height: 1120px;
+}
+.lamp-beam { filter: blur(16px); }
+.lamp-beam::before,
+.lamp-beam::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+.lamp-beam::before {
+  clip-path: polygon(0 calc(50% - 46px), 0 calc(50% + 46px), 100% 100%, 100% 0);
+  background: linear-gradient(90deg, rgba(255, 228, 176, 0.4), rgba(255, 214, 152, 0.15) 35%, rgba(255, 204, 140, 0.05) 65%, transparent 92%);
+}
+.lamp-beam::after {
+  clip-path: polygon(0 calc(50% - 32px), 0 calc(50% + 32px), 100% 76%, 100% 24%);
+  background: linear-gradient(90deg, rgba(255, 242, 214, 0.26), transparent 55%);
+}
+/* ฝุ่นลอยในแสง: เห็นเฉพาะในกรวยแสง · หยุดนิ่งเมื่อปิดไฟ */
+.lamp-motes {
+  clip-path: polygon(0 calc(50% - 46px), 0 calc(50% + 46px), 100% 100%, 100% 0);
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+.lamp-room[data-light="on"] .lamp-motes { opacity: 1; transition: opacity 1.4s ease-out 0.5s; }
+.lamp-mote {
+  position: absolute;
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: rgba(255, 238, 205, 0.85);
+  box-shadow: 0 0 6px rgba(255, 218, 160, 0.7);
+  animation: mote-drift var(--dur) ease-in-out var(--delay) infinite;
+  animation-play-state: paused;
+}
+.lamp-room[data-light="on"] .lamp-mote { animation-play-state: running; }
+/* แขนโคม: ก้านหลักกับก้านคู่ขนาน + สปริง · ข้อต่อทองเหลือง (ความยาวและมุมตั้งโดย lamp-engine.ts)
+   ความหนาแขน ข้อต่อ และฐาน ตามขนาดโคม --lamp-s ที่ lamp-engine.ts ตั้ง (จอสูงโคมใหญ่ จอเตี้ยย่อลง) */
+.lamp-arm {
+  --t: calc(9px * var(--lamp-s, 1));
+  position: absolute;
+  left: 0;
+  top: calc(var(--t) / -2);
+  height: var(--t);
+  border-radius: var(--t);
+  transform-origin: 0 50%;
+  background: linear-gradient(#5b5e66, #2a2c32);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+/* ก้านคู่ขนานวิ่งเต็มความยาวแขน ยึดกับข้อต่อทั้งสองปลาย */
+.lamp-arm::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: calc(var(--t) * -0.56);
+  height: calc(var(--t) * 0.28);
+  border-radius: 3px;
+  background: #43464d;
+}
+.lamp-arm::before {
+  content: "";
+  position: absolute;
+  left: 24%;
+  width: 38%;
+  top: 50%;
+  height: calc(var(--t) * 1.45);
+  translate: 0 -50%;
+  border-radius: 4px;
+  background: repeating-linear-gradient(90deg, #b9bcc3 0 1.5px, transparent 1.5px 4.5px);
+  opacity: 0.85;
+}
+.lamp-joint {
+  --j: calc(18px * var(--lamp-s, 1));
+  position: absolute;
+  left: calc(var(--j) / -2);
+  top: calc(var(--j) / -2);
+  width: var(--j);
+  height: var(--j);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #f5dea6, #c09447 55%, #6f5222);
+  box-shadow: 0 0 0 2.5px #24262b, 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+/* ฐานโคม: จุดยึดแขน (กลางผิวบนของฐาน) = จุด transform-origin · ย่อขยายรอบจุดนี้ */
+.lamp-base { position: absolute; left: -70px; top: -14px; transform-origin: 70px 14px; }
+.lamp-base svg { display: block; }
+
+/* สายดึง: ห้อยลงตามแรงโน้มถ่วงจากใต้คอหัวโคม · ลูกปัดเซรามิกเรืองแสงในที่มืด (อยู่เหนือความมืด) */
+.lamp-cord-line { position: absolute; left: 0; top: 0; z-index: 9; overflow: visible; pointer-events: none; }
+.lamp-cord-line path { fill: none; stroke: #8f8a82; stroke-width: 1.6; stroke-linecap: round; transition: stroke 0.6s ease; }
+.lamp-room[data-light="on"] .lamp-cord-line path { stroke: #6e675d; }
+/* ปุ่มกว้างกว่าลูกปัด (พื้นที่แตะ 44×52) · ขอบบนกลางปุ่ม = ปลายสาย = จุดหมุนของลูกปัด */
+.lamp-bead {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 10;
+  width: 44px;
+  height: 52px;
+  border-radius: 14px;
+  transform-origin: 22px 0;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+.lamp-bead[data-dragging] { cursor: grabbing; }
+.lamp-bead-body {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 14px;
+  height: var(--bead-h);
+  margin-left: -7px;
+  border-radius: 7px 7px 9px 9px / 8px 8px 14px 14px;
+  background: radial-gradient(120% 90% at 35% 28%, #fffaf0, #e9dcc6 55%, #b9a78a);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2), 0 6px 10px -4px rgba(0, 0, 0, 0.55);
+  transition: box-shadow 0.6s ease;
+}
+/* ปุ่มทองเหลืองที่ผูกสาย */
+.lamp-bead-body::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 8px;
+  height: 5px;
+  margin-left: -4px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #6f5220, #e6c785, #7d5f27);
+}
+.lamp-room[data-light="off"] .lamp-bead-body {
+  background: radial-gradient(120% 90% at 35% 28%, #f4fff7, #cdeedc 55%, #8db6a0);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 0 14px 3px rgba(190, 245, 210, 0.4), 0 0 4px 1px rgba(210, 255, 225, 0.55);
+}
+.lamp-bead:focus-visible .lamp-bead-body { outline: 2px solid #ffd58a; outline-offset: 5px; }
+/* ไส้หลอดยังเรืองส้มหลังปิดไฟแล้วค่อยๆ ดับ (เฉพาะหลังเคยเปิดไฟแล้ว) — ตามตำแหน่งหลอด เหนือความมืด */
+.lamp-ember {
+  position: absolute;
+  left: -16px;
+  top: -16px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 160, 70, 0.95), rgba(255, 120, 40, 0.35) 45%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+}
+.lamp-room[data-light="off"][data-touched] .lamp-ember { animation: lamp-afterglow 1.6s ease-out; }
+
+/* คำชวนดึงสาย: อยู่ที่เดียวกับการ์ด (ตอนไฟปิด) เหนือความมืด */
+.lamp-hint {
+  grid-row: 2;
+  grid-column: 1;
+  align-self: center;
+  justify-self: center;
+  position: relative;
+  left: var(--card-shift);
+  z-index: 10;
+  text-align: center;
+  pointer-events: none;
+  transition: opacity 0.4s ease, translate 0.4s ease;
+}
+.lamp-room[data-light="on"] .lamp-hint { opacity: 0; translate: 0 -6px; }
+.lamp-hint-main { font-size: 1.0625rem; font-weight: 500; letter-spacing: -0.01em; color: rgba(240, 234, 224, 0.84); }
+.lamp-hint-sub { margin-top: 0.375rem; font-size: 0.8125rem; color: rgba(240, 234, 224, 0.58); }
+.lamp-hint kbd {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.0625rem 0.4375rem;
+  border-radius: 6px;
+  border: 1px solid rgba(240, 234, 224, 0.28);
+  color: rgba(240, 234, 224, 0.78);
+}
+/* จอสัมผัสไม่มีปุ่ม Enter ให้กด */
+@media (hover: none) { .lamp-hint-sub { display: none; } }
+
+/* การ์ด: ตั้งบนผิวโต๊ะ (ล้นลงไปในแถวโต๊ะ 14px) · ซ่อนในความมืด · เปิดไฟแล้วลอยขึ้นจากเงา (รอหลอดติดก่อน 0.3 วินาที) */
+.lamp-reveal {
+  grid-row: 2;
+  grid-column: 1;
+  justify-self: center;
+  position: relative;
+  left: var(--card-shift);
+  z-index: 8;
+  width: calc(100% - 2rem);
+  max-width: 24rem;
+  margin-bottom: -14px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(18px) scale(0.985);
+  filter: blur(6px);
+  transition: opacity 0.28s ease-in, transform 0.28s ease-in, filter 0.28s ease-in, visibility 0s linear 0.28s;
+}
+.lamp-room[data-light="on"] .lamp-reveal {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  filter: none;
+  transition: opacity 0.7s var(--ease) 0.3s, transform 0.9s var(--ease) 0.3s, filter 0.7s var(--ease) 0.3s, visibility 0s;
+}
+/* เงาการ์ดบนผิวโต๊ะ */
+.lamp-reveal::after {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  bottom: -9px;
+  height: 18px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.45), transparent);
+}
+/* สีชุดสว่างเฉพาะการ์ด (กระดาษขาวอุ่นใต้แสงหลอด) — ไม่ตามธีมมืดของเครื่อง */
+.lamp-card {
+  color-scheme: light;
+  --surface: #fffdfa;
+  --surface-2: #f4efe8;
+  --surface-3: #ebe4da;
+  --ink: #1f1b17;
+  --ink-2: #51493f;
+  --ink-3: #6b6258;
+  --line: #ebe3d8;
+  --line-strong: #d6cbbd;
+  --line-msp: #d3263a;
+  --accent: #d3263a;
+  --accent-soft: #fdebed;
+  --brand: #d3263a;
+  --focus: #d3263a;
+  --btn: #d3263a;
+  --btn-fg: #ffffff;
+  --btn-hover: #b51d30;
+  --warn: #946000;
+  --loss: #d3263a;
+  --loss-text: #b4161f;
+  --loss-soft: #fde8ea;
+  position: relative;
+  border-radius: 16px;
+  padding: 2.25rem 2rem 1.25rem;
+  color: var(--ink);
+  /* แสงโคมตกจากมุมซ้ายบน ขยับตามหัวโคมที่ผงก (--sway) · เงาการ์ดทอดไปทางขวาล่างบนผนัง */
+  background:
+    radial-gradient(120% 80% at calc(6% + var(--sway, 0) * 10px) -12%, rgba(255, 205, 140, 0.26), transparent 62%),
+    var(--surface);
+  box-shadow: calc(16px + var(--sway, 0) * -3px) 20px 44px -16px rgba(28, 18, 10, 0.5);
+}
+@media (max-width: 639px) {
+  .lamp-card { padding: 1.75rem 1.5rem 1rem; }
+}
+.lamp-card .field { min-height: 3rem; border-radius: 12px; padding: 0.75rem 1rem; }
+.lamp-card .field:focus-visible { box-shadow: 0 0 0 4px rgba(211, 38, 58, 0.14); }
+.lamp-card .btn-primary { min-height: 3rem; border-radius: 12px; box-shadow: 0 12px 24px -14px rgba(211, 38, 58, 0.9); }
+.lamp-card .icon-btn { width: 36px; height: 36px; border-radius: 10px; }
+/* เบราว์เซอร์เติมรหัสผ่านให้: แทนพื้นฟ้าของเบราว์เซอร์ด้วยสีช่องกรอกของการ์ด (พื้นของ autofill เปลี่ยนตรงไม่ได้ จึงใช้เงาด้านในทับ) */
+.lamp-card .field:-webkit-autofill,
+.lamp-card .field:-webkit-autofill:hover {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  box-shadow: 0 0 0 100px var(--surface-2) inset;
+}
+.lamp-card .field:-webkit-autofill:focus-visible {
+  box-shadow: 0 0 0 100px var(--surface) inset, 0 0 0 4px rgba(211, 38, 58, 0.14);
+}
+/* จอเตี้ย: ที่ว่างเหนือการ์ดน้อยลง (หัวโคมชิดขอบบน) · การ์ดกระชับขึ้น */
+@media (max-height: 780px) {
+  .lamp-room { grid-template-rows: minmax(7rem, 1fr) auto var(--desk-h); }
+  .lamp-card { padding-top: 1.5rem; padding-bottom: 1rem; }
+  .lamp-card .logo-mark { width: auto; height: 44px; }
+  .lamp-card h1 { margin-top: 0.75rem; }
+  .lamp-card form { margin-top: 1.25rem; }
+  .lamp-card .field,
+  .lamp-card .btn-primary { min-height: 2.75rem; }
+}
+@media (max-height: 700px) {
+  .lamp-room { --desk-h: 60px; grid-template-rows: minmax(6.5rem, 1fr) auto var(--desk-h); }
+  .lamp-card { padding-top: 1.25rem; }
+  .lamp-card h1 { margin-top: 0.5rem; }
+}
+
+@keyframes lamp-flicker {
+  0% { opacity: 0; }
+  7% { opacity: 0.8; }
+  13% { opacity: 0.08; }
+  22% { opacity: 0.95; }
+  29% { opacity: 0.32; }
+  40%, 100% { opacity: 1; }
+}
+/* ความมืดกระพริบสวนกับหลอดไฟ */
+@keyframes night-flicker {
+  0% { opacity: 0.93; }
+  7% { opacity: 0.24; }
+  13% { opacity: 0.88; }
+  22% { opacity: 0.06; }
+  29% { opacity: 0.62; }
+  40%, 100% { opacity: 0; }
+}
+@keyframes lamp-afterglow {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes bead-breathe {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 0 10px 2px rgba(190, 245, 210, 0.26), 0 0 3px 1px rgba(210, 255, 225, 0.4); }
+  50% { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25), 0 0 20px 5px rgba(190, 245, 210, 0.5), 0 0 5px 1px rgba(210, 255, 225, 0.75); }
+}
+@keyframes mote-drift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.25; }
+  50% { transform: translate(var(--mx), var(--my)); opacity: 0.9; }
+}
+@keyframes hint-in {
+  from { opacity: 0; translate: 0 6px; }
+}
+@keyframes fixture-in {
+  from { opacity: 0; }
+}
+/* กระดานชอล์กเขียนตัวเอง: เส้นแกนลาก · ตัวเลขปรากฏ · แท่งเทียนงอกจากฐานเรียงจากซ้าย · ราคาล่าสุดเขียนท้ายสุด */
+@keyframes chalk-draw {
+  from { stroke-dashoffset: 1; }
+}
+@keyframes chalk-fade {
+  from { opacity: 0; }
+}
+@keyframes candle-in {
+  from { opacity: 0; transform: scaleY(0.3); }
+}
+/* ของบนโต๊ะ: ไอกาแฟลอยขึ้นแล้วจาง · นาฬิกาปลุกสั่นกริ่งครั้งเดียวหลังไฟติด */
+@keyframes steam-rise {
+  0% { opacity: 0; transform: translateY(6px) scaleY(0.92); }
+  35% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(-12px) scaleY(1.08); }
+}
+@keyframes clock-ring {
+  0%, 100% { transform: rotate(0); }
+  12.5%, 37.5%, 62.5% { transform: rotate(-2.5deg); }
+  25%, 50%, 75% { transform: rotate(2.5deg); }
+}
+@keyframes hammer-ring {
+  0%, 100% { transform: rotate(0); }
+  10%, 30%, 50%, 70% { transform: rotate(-28deg); }
+  20%, 40%, 60%, 80% { transform: rotate(28deg); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .lamp-room[data-light="on"] [data-lit] { animation: lamp-flicker 0.6s linear; }
+  .lamp-room[data-light="on"] .lamp-night { animation: night-flicker 0.6s linear; }
+  .lamp-room[data-light="off"] .lamp-bead-body { animation: bead-breathe 3.4s ease-in-out infinite; }
+  .lamp-room[data-ready] .lamp-fixture { animation: fixture-in 0.6s ease-out; }
+  .lamp-room[data-light="on"] .chalk-axis { animation: chalk-draw 0.6s var(--ease) 0.45s backwards; }
+  .lamp-room[data-light="on"] .chalk-label { animation: chalk-fade 0.5s ease-out 0.8s backwards; }
+  .lamp-room[data-light="on"] .chalk-candle { animation: candle-in 0.28s var(--ease) backwards; animation-delay: calc(0.9s + var(--i) * 30ms); }
+  .lamp-room[data-light="on"] .chalk-last { animation: chalk-fade 0.4s ease-out 2.2s backwards; }
+  .lamp-room[data-light="on"] .decor-steam path { animation: steam-rise 4.5s ease-in-out infinite; }
+  .lamp-room[data-light="on"] .decor-steam path:nth-child(2) { animation-delay: 1.5s; }
+  .lamp-room[data-light="on"] .decor-steam path:nth-child(3) { animation-delay: 3s; }
+  .lamp-room[data-light="on"] .decor-clock { animation: clock-ring 0.8s ease-in-out 0.9s; }
+  .lamp-room[data-light="on"] .decor-hammer { animation: hammer-ring 0.8s linear 0.9s; }
+  .lamp-hint { animation: hint-in 1s var(--ease) 0.9s backwards; }
+  .lamp-card .login-error { animation: hint-in 0.3s var(--ease); }
+}
+/* ลดการเคลื่อนไหว: ไม่กระพริบ ไม่ลอย ไม่มีฝุ่น — เปิด/ปิดเป็นการจางสั้นๆ (หัวโคมไม่ผงก: lamp-engine.ts)
+   ไอกาแฟนิ่งจางๆ · นาฬิกาไม่สั่นกริ่งและซ่อนเข็มวินาที (เข็มชั่วโมง/นาทียังบอกเวลา) · จอแล็ปท็อปติดพร้อมไฟ */
+@media (prefers-reduced-motion: reduce) {
+  .lamp-motes { display: none; }
+  .decor-steam path { opacity: 0.35; }
+  .decor-clock-second { display: none; }
+  .lamp-room[data-light="on"] .decor-screen { transition: opacity 0.15s ease; }
+  .lamp-room[data-light="on"] [data-lit],
+  .lamp-room[data-light="on"] .lamp-night { transition: opacity 0.15s ease; }
+  .lamp-reveal {
+    transform: none;
+    filter: none;
+    transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+  }
+  .lamp-room[data-light="on"] .lamp-reveal { transition: opacity 0.15s ease, visibility 0s; }
+}
+.login-error {
+  display: flex;
+  gap: 0.5rem;
+  border-radius: 16px;
+  background: var(--loss-soft);
+  color: var(--loss-text);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ===== กดเมนูแล้วขึ้น skeleton ของหน้าปลายทางทันที (components/nav-pending.tsx · tab-pane.tsx) =====
+   ระหว่างรอเซิร์ฟเวอร์: ซ่อนเนื้อหาหน้าเดิม เหลือ skeleton (ไม่ห่อเนื้อหาด้วย element ใหม่ — โครง .page-host > div คงเดิม) */
+.page-host[data-nav-pending] > :not([data-nav-skeleton]) { display: none; }
+/* ===== กล่องเลื่อนที่บอกว่า "ยังมีต่อ": ขอบล่างจางลงเมื่อเนื้อหายาวกว่ากล่อง หายเมื่อเลื่อนถึงท้าย =====
+   ใช้ scroll-driven animation: กล่องที่ไม่ล้น = ไม่มี scroll timeline = ไม่มีเงา · เบราว์เซอร์ที่ไม่รองรับ = ไม่มีเงา (เลื่อนได้ตามปกติ) */
+@property --fade-end { syntax: "<length>"; inherits: false; initial-value: 0px; }
+.scroll-fade { mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade-end)), transparent); }
+@supports (animation-timeline: scroll()) {
+  .scroll-fade { animation: scroll-fade-end linear both; animation-duration: auto; animation-timeline: scroll(self); }
+}
+@keyframes scroll-fade-end { 0%, 88% { --fade-end: 2.75rem; } 100% { --fade-end: 0px; } }

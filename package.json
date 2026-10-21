@@ -5,12 +5,14 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "node scripts/dev-open.mjs",
+    "start:prod": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "db:push": "drizzle-kit push",
     "db:seed": "tsx scripts/seed.ts",
     "import": "tsx scripts/import.ts",
+    "drive:auth": "tsx scripts/drive-auth.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

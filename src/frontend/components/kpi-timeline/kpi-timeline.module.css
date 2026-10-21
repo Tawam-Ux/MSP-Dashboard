@@ -1,0 +1,166 @@
+/* ===== Timeline บนการ์ด KPI =====
+   การขยายแบบ Microsoft Store มาจาก ExpandCard (src/frontend/components/expand-card) — ไฟล์นี้คือเนื้อหาในการ์ดที่ขยาย:
+   เส้นของตัวชี้วัดกวาดผ่านทีละเดือน สถานีโผล่ตอนเส้นไปถึง แล้วสถานีปลายทางบานวงแหวน · ลดการเคลื่อนไหว = เส้นแสดงครบทันที */
+
+/* ลำดับเข้าของการ์ด KPI (globals.css นับจาก .kpi:nth-child — การ์ดอยู่ในกรอบนี้ จึงส่งลำดับต่อให้) */
+.tile:nth-child(2) { --k: 1; }
+.tile:nth-child(3) { --k: 2; }
+.tile:nth-child(4) { --k: 3; }
+
+/* ป้ายบอกว่าการ์ดนี้มี Timeline: เส้นกับสถานีเล็กๆ มุมขวาบน แนวเดียวกับป้ายวงกลม */
+.hint {
+  position: absolute;
+  top: calc(1rem + (2.125rem - 18px) / 2);
+  right: 1.25rem;
+  color: var(--ink-3);
+  pointer-events: none;
+  transition: color 0.16s var(--ease-out), opacity 0.16s var(--ease-out);
+}
+.tile:hover .hint { color: var(--ink-2); }
+.tile[data-open] .hint { opacity: 0; }
+
+/* ระยะในเท่ากับการ์ด KPI (.kpi) — ตอนเริ่มขยาย หัวการ์ดทับตำแหน่งเดิมพอดี */
+.content {
+  --kt-well: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem 1.25rem 1.125rem;
+}
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"])) .content { --kt-well: var(--surface-3); }
+}
+:global(:root[data-theme="dark"]) .content { --kt-well: var(--surface-3); }
+
+/* ===== กราฟ: เส้น 0/ฐาน (นิ่ง) · เส้นกับพื้น (กวาด) · สถานี ป้าย และจุดชี้ (บนสุด) ===== */
+.chart { position: relative; }
+.layer, .sweep { position: absolute; inset: 0; }
+.layer, .sweep > svg { display: block; overflow: visible; }
+.zero { stroke: var(--line-strong); stroke-width: 1; }
+.base { stroke: var(--line); stroke-width: 1; }
+.line {
+  fill: none;
+  stroke: var(--kt-line);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.line[data-loss] { stroke: var(--loss); }
+.cross { opacity: 0; pointer-events: none; }
+.cross[data-on] { opacity: 1; }
+.cross line { stroke: var(--line-strong); stroke-width: 1; }
+.haloAt { pointer-events: none; }
+.halo {
+  fill: var(--kt-line);
+  fill-opacity: 0.16;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.halo[data-loss] { fill: var(--loss); }
+.station {
+  r: 4px;
+  fill: var(--x-bg);
+  stroke: var(--kt-line);
+  stroke-width: 2.25;
+  transform-box: fill-box;
+  transform-origin: center;
+  pointer-events: none;
+}
+.station[data-loss] { stroke: var(--loss); }
+.station[data-on] { r: 5.5px; stroke-width: 3; }
+/* ป้ายค่าสูงสุด/ต่ำสุด: สีตัวอักษร (ไม่ใช้สีเส้น) มีขอบสีพื้นกันเส้นทับ */
+.peak {
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  fill: var(--ink-2);
+  paint-order: stroke;
+  stroke: var(--x-bg);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.hit { fill: transparent; cursor: crosshair; touch-action: pan-y; }
+
+.months {
+  position: relative;
+  height: 1.0625rem;
+  margin-top: 0.25rem;
+  font-size: 0.6875rem;
+  line-height: 1.0625rem;
+  color: var(--ink-3);
+}
+.months > span {
+  position: absolute;
+  top: 0;
+  translate: -50% 0;
+  white-space: nowrap;
+}
+.months > span[data-on] { color: var(--ink); font-weight: 600; }
+
+/* ===== แถบค่าของเดือนที่ชี้ (ค่าเริ่มต้น = เดือนล่าสุด) ===== */
+.readout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.125rem 0.75rem;
+  padding: 0.5rem 0.875rem;
+  border-radius: 14px;
+  background: var(--kt-well);
+  font-size: 0.8125rem;
+}
+.readMonth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.readDot {
+  width: 0.625rem;
+  height: 0.625rem;
+  flex-shrink: 0;
+  border: 2px solid var(--kt-line);
+  border-radius: 999px;
+  background: var(--x-bg);
+}
+.readDot[data-loss] { border-color: var(--loss); }
+.readValue { text-align: right; font-weight: 600; white-space: nowrap; }
+.readNote { min-width: 0; font-size: 0.75rem; color: var(--ink-3); }
+.readAside { font-size: 0.75rem; text-align: right; color: var(--ink-3); white-space: nowrap; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hint { animation: fade 0.3s var(--ease-out) backwards; animation-delay: calc(420ms + var(--k, 0) * 50ms); }
+
+  /* เส้นกวาดจากเดือนแรกไปเดือนล่าสุด · สถานี ป้าย และชื่อเดือนโผล่ตอนเส้นไปถึง (--d ตั้งจาก JS) · สถานีปลายทางบานวงแหวน */
+  [data-fresh] .sweep { animation: sweep var(--kt-sweep-ms) var(--kt-sweep-ease) var(--kt-sweep-delay) backwards; }
+  [data-fresh] .station { animation: arrive 0.28s var(--ease-out) var(--d, 0ms) backwards; }
+  [data-fresh] .halo { animation: bloom 0.9s var(--ease-out) var(--d, 0ms) backwards; }
+  [data-fresh] .peak,
+  [data-fresh] .months > span { animation: fade 0.24s var(--ease-out) var(--d, 0ms) backwards; }
+
+  /* ชี้เดือนอื่น: สถานีขยาย จุดชี้และวงแหวนเลื่อนตามนุ่มๆ */
+  .station { transition: r 0.16s var(--ease-out), stroke-width 0.16s var(--ease-out); }
+  [data-state="open"] .cross,
+  [data-state="open"] .haloAt { transition: transform 0.14s var(--ease-out), opacity 0.14s var(--ease-out); }
+}
+
+@keyframes sweep {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes arrive {
+  0% { opacity: 0; scale: 0.3; }
+  60% { opacity: 1; }
+  100% { opacity: 1; scale: 1; }
+}
+@keyframes bloom {
+  from { opacity: 0; scale: 0.3; }
+  to { opacity: 1; scale: 1; }
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

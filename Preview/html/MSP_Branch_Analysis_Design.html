@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSP Interfood | Branch Analysis Prototype</title>
+<style>
+:root{
+  --navy:#0b2d5d;--blue:#174a87;--green:#14804a;--red:#c62828;--orange:#ef7c14;
+  --ink:#182230;--muted:#687386;--line:#e4eaf1;--bg:#f4f7fb;--card:#fff;--soft:#eef4fb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:"Segoe UI",Tahoma,sans-serif;color:var(--ink)}
+.app{display:grid;grid-template-columns:245px 1fr;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#0a2b57,#123f7a);color:#fff;padding:26px 18px;position:sticky;top:0;height:100vh}
+.logo{font-size:22px;font-weight:800}.sub{font-size:12px;opacity:.72;margin:5px 0 30px}
+.nav a{display:block;color:#dce8f6;padding:12px 14px;border-radius:10px;text-decoration:none;margin:5px 0;font-size:14px}
+.nav a.active{background:rgba(255,255,255,.14);color:#fff;font-weight:700}
+.sidefoot{position:absolute;bottom:22px;left:18px;right:18px;font-size:11px;opacity:.65;line-height:1.55}
+main{padding:26px 30px 40px;min-width:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}
+.top h1{margin:0;color:var(--navy);font-size:26px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;font:inherit}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 0}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 18px;box-shadow:0 2px 8px rgba(20,43,70,.04);position:relative;overflow:hidden}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
+.label{font-size:13px;color:var(--muted);font-weight:700}.value{font-size:27px;font-weight:800;color:var(--accent);margin:8px 0 4px}.detail{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-top:16px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 2px 8px rgba(20,43,70,.04)}
+.card h3{margin:0 0 4px;color:var(--navy);font-size:16px}.cap{font-size:12px;color:var(--muted);margin-bottom:13px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}.tbl th{background:#f5f7fa;text-align:left;padding:10px;color:#667085;border-bottom:1px solid var(--line)}.tbl td{padding:10px;border-bottom:1px solid #eef1f4}.num{text-align:right;font-variant-numeric:tabular-nums}
+.badge{font-size:11px;padding:4px 8px;border-radius:999px;font-weight:800}.bad{background:#fff0f0;color:#c62828}.good{background:#eaf7ef;color:#14804a}.warn{background:#fff7e8;color:#9a6700}
+.rank{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eef1f4}.rank:last-child{border-bottom:0}
+.rankname{width:120px;font-weight:700;font-size:13px}.barwrap{flex:1;height:10px;background:#eef2f6;border-radius:999px;overflow:hidden}.bar{height:100%;border-radius:999px;background:#c62828}.rankval{width:88px;text-align:right;font-size:12px}
+.factor{padding:12px 14px;border-radius:12px;margin-top:10px}.factor.red{background:#fff2f2;border:1px solid #f2cccc}.factor.orange{background:#fff8ec;border:1px solid #f4ddb5}.factor.green{background:#effaf4;border:1px solid #ccebd8}
+.factor h4{margin:0 0 6px;font-size:14px}.factor p{margin:0;font-size:12px;line-height:1.6;color:#5b6675}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.comp{border:1px solid var(--line);border-radius:12px;padding:14px}.comp h4{margin:0 0 10px;color:var(--navy)}.metric{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ebf0;font-size:13px}.metric:last-child{border-bottom:0}.metric b{font-variant-numeric:tabular-nums}
+.note{font-size:12px;color:var(--muted);line-height:1.6}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.sidebar{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:600px){main{padding:18px}.kpis{grid-template-columns:1fr}.top{flex-direction:column}.compare{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="logo">MSP INTERFOOD</div>
+  <div class="sub">Financial Dashboard · Design Prototype</div>
+  <div class="nav">
+    <a>Overview</a>
+    <a>P&L Analysis</a>
+    <a>Sales Zone</a>
+    <a class="active">Branch Analysis</a>
+    <a>Operations</a>
+  </div>
+  <div class="sidefoot">หน้า 4 · Branch Analysis<br>เจาะสาขาขาดทุนและสาเหตุหลัก</div>
+</aside>
+
+<main>
+  <div class="top">
+    <div>
+      <h1>Branch Analysis</h1>
+      <p>MSP Interfood · วิเคราะห์สาขาขาดทุนและคุณภาพกำไร</p>
+    </div>
+    <div class="controls">
+      <select><option>มิถุนายน 2569</option></select>
+      <select id="zoneFilter"><option>ทุกโซน</option><option>เชียงใหม่</option><option>ขอนแก่น</option></select>
+    </div>
+  </div>
+
+  <section class="kpis">
+    <div class="kpi" style="--accent:#c62828">
+      <div class="label">สาขาขาดทุน</div><div class="value" id="lossCount">-</div><div class="detail">จำนวนสาขาที่ PBT ติดลบ</div>
+    </div>
+    <div class="kpi" style="--accent:#c62828">
+      <div class="label">ขาดทุนรวม</div><div class="value" id="lossTotal">-</div><div class="detail">รวม PBT ของสาขาขาดทุนที่แสดง</div>
+    </div>
+    <div class="kpi" style="--accent:#ef7c14">
+      <div class="label">สาขาขาดทุนสูงสุด</div><div class="value" id="worstBranch">-</div><div class="detail" id="worstValue">-</div>
+    </div>
+    <div class="kpi" style="--accent:#14804a">
+      <div class="label">Benchmark Case</div><div class="value">แม่มาลัย</div><div class="detail">ใช้เทียบกับจอมทองเพื่อดู Gap</div>
+    </div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Loss Ranking</h3>
+      <div class="cap">เรียงตามขาดทุนก่อนภาษีสูงสุด</div>
+      <div id="lossRanking"></div>
+    </section>
+
+    <section class="card">
+      <h3>Key Drivers</h3>
+      <div class="cap">ปัจจัยที่ทำให้สาขาขาดทุน</div>
+      <div class="factor red">
+        <h4>GP Margin ต่ำ</h4>
+        <p>หากกำไรขั้นต้นต่ำกว่าระดับที่รองรับค่าใช้จ่ายคงที่ สาขาจะเข้าสู่ภาวะขาดทุนได้เร็ว</p>
+      </div>
+      <div class="factor orange">
+        <h4>SG&A สูงเมื่อเทียบยอดขาย</h4>
+        <p>ค่าแรง ค่าเช่า และค่าใช้จ่ายประจำที่สูง จะกด Operating Profit โดยเฉพาะสาขายอดขายต่ำ</p>
+      </div>
+      <div class="factor green">
+        <h4>ใช้สาขาที่โครงสร้างใกล้กันเป็น Benchmark</h4>
+        <p>เทียบสาขาที่พื้นที่ใกล้กันเพื่อแยกผลจากยอดขาย GP และค่าใช้จ่ายให้เห็นชัดขึ้น</p>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Branch Detail</h3>
+      <div class="cap">ตารางสาขาที่ต้องติดตาม</div>
+      <table class="tbl">
+        <thead><tr><th>โซน</th><th>สาขา</th><th class="num">Revenue</th><th class="num">GP Margin</th><th class="num">SG&A</th><th class="num">PBT</th><th>สถานะ</th></tr></thead>
+        <tbody id="branchRows"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h3>Case Comparison</h3>
+      <div class="cap">จอมทอง vs แม่มาลัย · พื้นที่ 128 ตร.ม.</div>
+      <div class="compare">
+        <div class="comp">
+          <h4>จอมทอง</h4>
+          <div class="metric"><span>Revenue</span><b>1.405 ลบ.</b></div>
+          <div class="metric"><span>GP Margin</span><b class="bad">5.98%</b></div>
+          <div class="metric"><span>SG&A / Revenue</span><b class="bad">28.15%</b></div>
+          <div class="metric"><span>PBT</span><b class="bad">-0.354 ลบ.</b></div>
+        </div>
+        <div class="comp">
+          <h4>แม่มาลัย</h4>
+          <div class="metric"><span>Revenue</span><b>1.921 ลบ.</b></div>
+          <div class="metric"><span>GP Margin</span><b class="good">16.52%</b></div>
+          <div class="metric"><span>SG&A / Revenue</span><b class="good">10.89%</b></div>
+          <div class="metric"><span>PBT</span><b class="good">+0.020 ลบ.</b></div>
+        </div>
+      </div>
+      <p class="note"><b>Insight:</b> จอมทองมีทั้งยอดขายต่ำกว่า GP Margin ต่ำกว่า และ SG&A สูงกว่าแม่มาลัยอย่างชัดเจน จึงอธิบายการขาดทุนได้ครบทั้งด้านรายได้และโครงสร้างต้นทุน</p>
+    </section>
+  </div>
+</main>
+</div>
+
+<script>
+const DATA=[{"zone": "เชียงใหม่", "branch": "จอมทอง", "revenue": 1405000, "gp_margin": 5.98, "sga_ratio": 28.15, "pbt": -354000, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "ทุ่งเจริญ", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -188388, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "วาปีปทุม", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -170908, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "น้ำพอง", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -152356, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "ชุมแพ", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -75292, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "โกสุม2", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -52705, "status": "ขาดทุน"}, {"zone": "ขอนแก่น", "branch": "มมส", "revenue": null, "gp_margin": null, "sga_ratio": null, "pbt": -13565, "status": "ขาดทุน"}, {"zone": "เชียงใหม่", "branch": "แม่มาลัย", "revenue": 1921000, "gp_margin": 16.52, "sga_ratio": 10.89, "pbt": 20000, "status": "กำไร"}];
+const fmtM=v=>v==null?'—':(v/1e6).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})+' ลบ.';
+const fmt=v=>v==null?'—':Number(v).toLocaleString('th-TH',{maximumFractionDigits:2});
+function render(){
+  const zone=document.getElementById('zoneFilter').value;
+  const rows=DATA.filter(x=>zone==='ทุกโซน'||x.zone===zone);
+  const losses=rows.filter(x=>x.pbt<0).sort((a,b)=>a.pbt-b.pbt);
+  document.getElementById('lossCount').textContent=losses.length;
+  document.getElementById('lossTotal').textContent=fmtM(losses.reduce((s,x)=>s+x.pbt,0));
+  document.getElementById('worstBranch').textContent=losses[0]?.branch||'-';
+  document.getElementById('worstValue').textContent=losses[0]?fmtM(losses[0].pbt):'-';
+
+  const max=Math.max(...losses.map(x=>Math.abs(x.pbt)),1);
+  document.getElementById('lossRanking').innerHTML=losses.map((x,i)=>`
+    <div class="rank">
+      <div class="rankname">${i+1}. ${x.branch}</div>
+      <div class="barwrap"><div class="bar" style="width:${Math.max(8,Math.abs(x.pbt)/max*100)}%"></div></div>
+      <div class="rankval">${fmtM(x.pbt)}</div>
+    </div>`).join('')||'<div class="note">ไม่มีสาขาขาดทุนในตัวกรองนี้</div>';
+
+  document.getElementById('branchRows').innerHTML=rows.map(x=>{
+    let badge=x.pbt<0?'bad':'good', label=x.pbt<0?'ขาดทุน':'กำไร';
+    return `<tr>
+      <td>${x.zone}</td><td><b>${x.branch}</b></td>
+      <td class="num">${fmtM(x.revenue)}</td>
+      <td class="num">${x.gp_margin==null?'—':fmt(x.gp_margin)+'%'}</td>
+      <td class="num">${x.sga_ratio==null?'—':fmt(x.sga_ratio)+'%'}</td>
+      <td class="num">${fmtM(x.pbt)}</td>
+      <td><span class="badge ${badge}">${label}</span></td>
+    </tr>`;
+  }).join('');
+}
+document.getElementById('zoneFilter').onchange=render;
+render();
+</script>
+</body>
+</html>

@@ -1,18 +1,26 @@
 import type { Metadata } from "next";
-import { Bai_Jamjuree, IBM_Plex_Sans_Thai } from "next/font/google";
+import { Anuphan } from "next/font/google";
 import "./globals.css";
 
-const display = Bai_Jamjuree({ variable: "--font-display", subsets: ["thai", "latin"], weight: ["500", "600", "700"] });
-const body = IBM_Plex_Sans_Thai({ variable: "--font-body", subsets: ["thai", "latin"], weight: ["400", "500", "600"] });
+// Anuphan: ไทย-ละตินแบบไม่มีหัว เส้นโค้งมน ใช้ทั้งหัวข้อและเนื้อหา (variable 100–700)
+const body = Anuphan({ variable: "--font-body", subsets: ["thai", "latin"] });
 
+// ไม่ใส่ title/icon ใน metadata: หน้าแบบ dynamic ถูก stream metadata ใหม่ทุกครั้งที่เปลี่ยนหน้า
+// แท็ก <title>/<link rel=icon> จึงถูกถอดแล้วใส่ใหม่ ทำให้ชื่อและไอคอนบนแท็บเบราว์เซอร์กระพริบ
+// วางไว้ใน <head> ของ root layout ซึ่งไม่ถูก render ใหม่ระหว่างเปลี่ยนหน้าแทน (favicon อยู่ใน public/)
 export const metadata: Metadata = {
-  title: "MSP งบกำไรขาดทุน",
   description: "Dashboard งบกำไรขาดทุนรายเดือนของ MSP แยกตามหน่วยธุรกิจและสาขา",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="th" className={`${display.variable} ${body.variable} h-full antialiased`}>
+    <html lang="th" className={`${body.variable} h-full antialiased`}>
+      <head>
+        <title>MSP งบกำไรขาดทุน</title>
+        <link rel="icon" href="/icon.png" type="image/png" sizes="512x512" />
+        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+      </head>
       <body className="min-h-full">{children}</body>
     </html>
   );

@@ -1,0 +1,92 @@
+import { formatBahtDecimal, formatPct } from "@/backend/lib/format";
+import { Money } from "@/frontend/components/money";
+import type { ComputedLine, Statement } from "@/backend/lib/statement";
+
+/** ซ่อนบัญชีที่เป็น 0 และหัวข้อที่ไม่มีบัญชีเหลือ แต่คงยอดรวมไว้เสมอ */
+function visibleLines(lines: ComputedLine[]): ComputedLine[] {
+  const out: ComputedLine[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.kind === "account" && line.value === 0) continue;
+    if (line.kind === "heading") {
+      let j = i + 1;
+      let hasContent = false;
+      while (j < lines.length && lines[j].kind !== "heading") {
+        const next = lines[j];
+        if (next.kind === "total" || (next.kind === "account" && next.value !== 0)) hasContent = true;
+        j++;
+      }
+      if (!hasContent) continue;
+    }
+    out.push(line);
+  }
+  return out;
+}
+
+/** ความกว้างข้อความตัวเลขโดยประมาณ หน่วย ch (ตัวเลขแบบ tabular กว้าง 1ch เท่ากันทุกตัว · , และ . แคบ · % กว้างกว่า) */
+const textCh = (s: string) => [...s].reduce((w, c) => w + (c === "," || c === "." ? 0.35 : c === "%" ? 1.4 : 1), 0);
+
+export function StatementTable({ statement }: { statement: Statement }) {
+  const lines = visibleLines(statement.lines);
+  // ความกว้างคอลัมน์ตัวเลข = ตัวเลขยาวสุดของงบนี้ในแบบทศนิยม (ยาวสุดในทุกรูปแบบ) — ไม่ขึ้นกับรูปแบบที่เลือก หัวคอลัมน์จึงไม่ขยับตอนสลับ
+  // งบเล็กได้คอลัมน์แคบ เหลือที่ให้ชื่อรายการ · +0.6 เผื่อตัวหนาในแถวยอดรวม
+  const values = lines.flatMap((l) => (l.kind === "heading" ? [] : [l]));
+  const numCh = Math.max(0, ...values.map((l) => textCh(formatBahtDecimal(l.value)))) + 0.6;
+  const pctCh = Math.max(0, ...values.map((l) => textCh(formatPct(l.pctOfRevenue)))) + 0.6;
+  return (
+    <section aria-labelledby="statement-heading" className="card card-fixed card-xl">
+      <h2 id="statement-heading" className="card-title mb-4">งบกำไรขาดทุน</h2>
+      <div className="card-body">
+        {/* table-fixed + คอลัมน์ตัวเลขกว้างตาม numCh/pctCh (หน่วย ch = ความกว้างตัวเลข 1 ตัว) + ช่องว่างซ้ายขวาของเซลล์
+            ไม่แคบกว่าหัวคอลัมน์ · คอลัมน์ "รายการ" รับพื้นที่ที่เหลือ ชื่อยาวขึ้นบรรทัดใหม่แทนการดันคอลัมน์ตัวเลข */}
+        <table
+          className="w-full table-fixed border-separate border-spacing-0 text-sm"
+          style={{ "--num-w": `${numCh}ch`, "--pct-w": `${pctCh}ch` } as React.CSSProperties}
+        >
+          <colgroup>
+            <col />
+            <col className="w-[max(3.5rem,calc(var(--num-w)_+_1rem))] sm:w-[max(3.5rem,calc(var(--num-w)_+_1.5rem))]" />
+            <col className="w-[max(4.75rem,calc(var(--pct-w)_+_1.375rem))] sm:w-[max(4.75rem,calc(var(--pct-w)_+_1.75rem))]" />
+          </colgroup>
+          <thead>
+            <tr className="text-left text-[0.8125rem] text-ink-2">
+              <th scope="col" className="rounded-l-full bg-surface-2 px-3.5 py-2 font-medium">รายการ</th>
+              <th scope="col" className="bg-surface-2 px-2 py-2 text-right font-medium whitespace-nowrap sm:px-3">งวดนี้</th>
+              <th scope="col" className="rounded-r-full bg-surface-2 py-2 pr-3.5 pl-2 text-right font-medium whitespace-nowrap sm:pl-3.5">% รายได้</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lines.map((line, i) => {
+              if (line.kind === "heading") {
+                return (
+                  <tr key={i}>
+                    <th colSpan={3} scope="colgroup" className="px-3.5 pt-4 pb-1 text-left text-xs font-semibold text-ink-3">
+                      {line.name}
+                    </th>
+                  </tr>
+                );
+              }
+              const major = line.kind === "total" && line.emphasis === "major";
+              const isTotal = line.kind === "total";
+              const cell = major ? "bg-surface-2" : isTotal ? "border-t border-line" : "";
+              return (
+                <tr key={i}>
+                  <th
+                    scope="row"
+                    className={`px-3.5 py-1.5 text-left ${cell} ${major ? "rounded-l-full font-semibold text-navy" : isTotal ? "font-medium" : "font-normal text-ink-2"} ${line.kind === "account" && line.indent ? "pl-7" : ""}`}
+                  >
+                    {line.name}
+                  </th>
+                  <td className={`num px-2 py-1.5 text-right whitespace-nowrap sm:px-3 ${cell} ${major ? "font-semibold" : ""} ${line.value < 0 && isTotal ? "text-loss-text" : ""}`}>
+                    <Money value={line.value} />
+                  </td>
+                  <td className={`num py-1.5 pr-3.5 pl-2 text-right whitespace-nowrap text-ink-3 sm:pl-3.5 ${cell} ${major ? "rounded-r-full" : ""}`}>{formatPct(line.pctOfRevenue)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  );
+}

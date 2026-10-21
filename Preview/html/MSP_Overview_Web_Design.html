@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MSP Interfood — Executive Overview</title>
+<style>
+:root{--navy:#0b2d5d;--blue:#174a87;--green:#14804a;--red:#c62828;--orange:#ef8b17;--bg:#f4f7fb;--card:#fff;--line:#e3e8ef;--ink:#182230;--muted:#687386}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:"Segoe UI",Tahoma,sans-serif;color:var(--ink)}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}.side{background:linear-gradient(180deg,#082a56,#123f7a);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh}
+.logo{font-size:22px;font-weight:800}.sub{font-size:12px;opacity:.7;margin:5px 0 28px}.nav div{padding:11px 13px;border-radius:10px;margin:5px 0;color:#dbe8f6;font-size:13px}.nav .active{background:rgba(255,255,255,.14);font-weight:700}
+.sidefoot{position:absolute;bottom:20px;left:18px;right:18px;font-size:11px;opacity:.68;line-height:1.55}
+main{padding:24px 28px 40px;min-width:0}.top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}.top h1{margin:0;color:var(--navy);font-size:26px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}select{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;font:inherit}
+.mode{display:inline-flex;border:1px solid var(--line);background:#fff;border-radius:11px;padding:4px;margin:16px 0}.mode button{border:0;background:transparent;color:var(--muted);font-weight:700;padding:8px 16px;border-radius:8px}.mode .active{background:var(--navy);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.kpi{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 17px;box-shadow:0 2px 8px rgba(17,39,66,.04);position:relative;overflow:hidden}.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
+.name{font-size:12px;color:var(--muted);font-weight:700}.val{font-size:27px;font-weight:800;color:var(--accent);margin:8px 0 4px}.meta{font-size:11px;color:var(--muted);line-height:1.5}.up{color:var(--green);font-weight:800}.down{color:var(--red);font-weight:800}
+.ratios{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:12px}.ratio{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px;text-align:center}.ratio b{display:block;color:var(--navy);font-size:18px}.ratio span{font-size:11px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:16px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;box-shadow:0 2px 8px rgba(17,39,66,.04)}.card h3{margin:0;color:var(--navy);font-size:15px}.cap{font-size:11px;color:var(--muted);margin:4px 0 12px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}.tabs button{border:1px solid var(--line);background:#fff;padding:6px 9px;border-radius:8px;font-size:11px;color:var(--muted)}.tabs .active{background:#edf3fb;color:var(--navy);font-weight:800}
+.chart{height:230px;border-bottom:1px solid #dfe6ee;position:relative;padding:20px 6px 26px}.line{position:absolute;height:3px;background:#174a87;transform-origin:left center;border-radius:999px}.line.old{background:#9aa7b7}.legend{font-size:11px;color:var(--muted);margin-top:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{border-radius:12px;padding:13px}.good{background:#eef9f3;border:1px solid #cde9d8}.bad{background:#fff2f2;border:1px solid #f0cccc}.panel h4{margin:0 0 7px;font-size:13px}.panel ul{margin:0;padding-left:18px;font-size:12px;line-height:1.75}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}.tbl th{background:#f5f7fa;color:#667085;text-align:left;padding:9px;border-bottom:1px solid var(--line)}.tbl td{padding:9px;border-bottom:1px solid #edf1f5}.num{text-align:right}
+.unitbar{display:flex;align-items:center;gap:9px;padding:7px 0}.unitname{width:70px;font-size:12px}.barwrap{height:9px;background:#edf1f5;border-radius:999px;overflow:hidden;flex:1}.bar{height:100%;background:#174a87}.unitval{width:65px;text-align:right;font-size:11px}
+.boxes{display:grid;grid-template-columns:1fr 1fr;gap:12px}.box{border:1px solid var(--line);border-radius:12px;padding:13px}.box h4{margin:0 0 8px;color:var(--navy);font-size:13px}.row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed #e6ebf0;font-size:12px}.row:last-child{border-bottom:0}
+.alert{display:flex;gap:9px;padding:9px 0;border-bottom:1px solid #edf1f5;font-size:12px}.dot{width:9px;height:9px;border-radius:50%;margin-top:4px;flex:0 0 auto}.r{background:var(--red)}.o{background:var(--orange)}
+.message{background:linear-gradient(90deg,#0d356b,#1a4f8c);color:#fff;border-radius:14px;padding:15px 16px;font-size:13px;line-height:1.65}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 11px;color:var(--navy);font-weight:700;font-size:12px}
+.note{font-size:11px;color:var(--muted);margin-top:8px}
+@media(max-width:1050px){.app{grid-template-columns:1fr}.side{display:none}.kpis{grid-template-columns:repeat(2,1fr)}.ratios{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}}
+@media(max-width:650px){main{padding:18px}.top{flex-direction:column}.filters{justify-content:flex-start}.kpis,.ratios,.two,.boxes{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo">MSP INTERFOOD</div>
+  <div class="sub">Executive Financial Dashboard</div>
+  <div class="nav">
+    <div class="active">Overview</div><div>P&L Analysis</div><div>Sales Zone</div><div>Branch Analysis</div><div>Operations</div>
+  </div>
+  <div class="sidefoot">สำนักงานใหญ่ = ค่าใช้จ่ายส่วนกลาง<br>ไม่จัดอันดับเป็น Profit Center</div>
+</aside>
+<main>
+  <div class="top">
+    <div><h1>Executive Overview</h1><p>MSP Interfood · ภาพรวมผลประกอบการและประเด็นสำคัญสำหรับผู้บริหาร</p></div>
+    <div class="filters"><select><option>ปี 2569</option></select><select><option>สิงหาคม</option></select><select><option>เทียบปีก่อน</option></select></div>
+  </div>
+  <div class="mode"><button>Monthly</button><button>YTD</button><button class="active">YoY</button></div>
+
+  <section class="kpis">
+    <div class="kpi" style="--accent:#174a87"><div class="name">Revenue</div><div class="val">335.22 M</div><div class="meta"><span class="up">▲ 7.05% YoY</span><br>+22.09 ลบ. จากปีก่อน</div></div>
+    <div class="kpi" style="--accent:#14804a"><div class="name">Gross Profit</div><div class="val">58.49 M</div><div class="meta">GP Margin 17.45%<br><span class="down">▼ 7.52% YoY</span></div></div>
+    <div class="kpi" style="--accent:#ef8b17"><div class="name">Operating Profit</div><div class="val">8.00 M</div><div class="meta">OP Margin 2.39%<br><span class="down">▼ 60.76% YoY</span></div></div>
+    <div class="kpi" style="--accent:#c62828"><div class="name">PBT</div><div class="val">3.88 M</div><div class="meta">PBT Margin 1.16%<br><span class="down">▼ 77.16% YoY</span></div></div>
+  </section>
+
+  <section class="ratios">
+    <div class="ratio"><b>17.45%</b><span>GP Margin</span></div><div class="ratio"><b>82.55%</b><span>Cost Ratio</span></div><div class="ratio"><b>15.06%</b><span>SG&A Ratio</span></div><div class="ratio"><b>2.39%</b><span>OP Margin</span></div><div class="ratio"><b>1.16%</b><span>PBT Margin</span></div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Trend 2569 vs 2568</h3><div class="cap">เลือกดู Revenue / GP / OP / PBT / Margin</div>
+      <div class="tabs"><button class="active">Revenue</button><button>GP</button><button>OP</button><button>PBT</button><button>Margin</button></div>
+      <div class="chart" id="trendChart"></div>
+      <div class="legend">● 2569 &nbsp;&nbsp; ● 2568</div>
+    </section>
+    <section class="card">
+      <h3>จุดเด่น / ประเด็นติดตาม</h3><div class="cap">สรุปสิ่งที่ควรเห็นทันทีจากภาพรวม</div>
+      <div class="two">
+        <div class="panel good"><h4>✓ จุดเด่น</h4><ul><li>Revenue สูงกว่าปีก่อน 22.09 ลบ.</li><li>ยอดขายยังมากกว่า 300 ลบ./เดือน</li><li>หลายหน่วยยังสร้างรายได้ต่อเนื่อง</li></ul></div>
+        <div class="panel bad"><h4>! ประเด็นติดตาม</h4><ul><li>GP Margin ลดเหลือ 17.45%</li><li>SG&A Ratio เพิ่มเป็น 15.06%</li><li>PBT ลด 77.16% YoY</li></ul></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>ผลประกอบการแยกหน่วย</h3><div class="cap">เชียงใหม่ / น่าน / สุโขทัย / ขนส่ง / โรงเชือด / ฟาร์ม</div>
+      <table class="tbl">
+        <thead><tr><th>หน่วย</th><th class="num">Revenue</th><th class="num">GP%</th><th class="num">OP</th><th class="num">OP%</th><th class="num">PBT</th><th class="num">PBT%</th></tr></thead>
+        <tbody>
+          <tr><td><b>เชียงใหม่</b></td><td class="num">222.42 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td><b>น่าน</b></td><td class="num">34.26 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td><b>สุโขทัย</b></td><td class="num">22.72 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td><b>ขนส่ง</b></td><td class="num">3.49 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td><b>โรงเชือด</b></td><td class="num">17.81 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+          <tr><td><b>ฟาร์ม</b></td><td class="num">77.12 M</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+      <div class="note">ตัวเลข Margin/Profit รายหน่วยจะดึงจาก Master จริงตอนพัฒนาระบบ</div>
+    </section>
+    <section class="card">
+      <h3>Performance by Unit</h3><div class="cap">เลือก Metric เพื่อเปรียบเทียบหน่วย</div>
+      <div class="tabs"><button class="active">Revenue</button><button>GP Margin</button><button>OP Margin</button><button>PBT</button><button>PBT Margin</button></div>
+      <div class="unitbar"><div class="unitname">เชียงใหม่</div><div class="barwrap"><div class="bar" style="width:100%"></div></div><div class="unitval">222.42</div></div>
+      <div class="unitbar"><div class="unitname">ฟาร์ม</div><div class="barwrap"><div class="bar" style="width:35%"></div></div><div class="unitval">77.12</div></div>
+      <div class="unitbar"><div class="unitname">น่าน</div><div class="barwrap"><div class="bar" style="width:15%"></div></div><div class="unitval">34.26</div></div>
+      <div class="unitbar"><div class="unitname">สุโขทัย</div><div class="barwrap"><div class="bar" style="width:10%"></div></div><div class="unitval">22.72</div></div>
+      <div class="unitbar"><div class="unitname">โรงเชือด</div><div class="barwrap"><div class="bar" style="width:8%"></div></div><div class="unitval">17.81</div></div>
+      <div class="unitbar"><div class="unitname">ขนส่ง</div><div class="barwrap"><div class="bar" style="width:2%"></div></div><div class="unitval">3.49</div></div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Top / Bottom Unit</h3><div class="cap">สรุปหน่วยเด่นและหน่วยที่ต้องติดตาม</div>
+      <div class="boxes">
+        <div class="box"><h4>Top</h4><div class="row"><span>Revenue สูงสุด</span><b>เชียงใหม่</b></div><div class="row"><span>Revenue รองลงมา</span><b>ฟาร์ม</b></div><div class="row"><span>ดู Margin</span><b>P&L Analysis</b></div></div>
+        <div class="box"><h4>Bottom / Watch</h4><div class="row"><span>Revenue ต่ำสุด</span><b>ขนส่ง</b></div><div class="row"><span>สำนักงานใหญ่</span><b>Central Cost</b></div><div class="row"><span>หน่วยต้องติดตาม</span><b>ดู PBT</b></div></div>
+      </div>
+    </section>
+    <section class="card">
+      <h3>Significant Expense</h3><div class="cap">ค่าใช้จ่ายเพิ่มสูงสุด Top 5</div>
+      <div class="row"><span>1. SG&A รวม</span><b class="down">+7.63 M</b></div>
+      <div class="row"><span>2. ค่าแรงและเงินเดือน</span><b class="down">+1.82 M</b></div>
+      <div class="row"><span>3. ค่าซ่อมบำรุง</span><b class="down">+0.89 M</b></div>
+      <div class="row"><span>4. ค่าสาธารณูปโภค</span><b class="down">+0.54 M</b></div>
+      <div class="row"><span>5. ค่าใช้จ่ายอื่น</span><b class="down">+0.31 M</b></div>
+    </section>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Watch List</h3><div class="cap">รายการที่ควรคลิกไปดูต่อ</div>
+      <div class="alert"><span class="dot r"></span><div><b>PBT ลด 77.16% YoY</b><br><span class="note">ไป P&L Analysis</span></div></div>
+      <div class="alert"><span class="dot o"></span><div><b>GP Margin ลด 2.75 จุด</b><br><span class="note">ดู Cost Ratio และ Gross Profit</span></div></div>
+      <div class="alert"><span class="dot r"></span><div><b>SG&A Ratio สูงขึ้น</b><br><span class="note">ดู Significant Expense</span></div></div>
+      <div class="alert"><span class="dot o"></span><div><b>สาขาขาดทุน / Sales per sq.m.</b><br><span class="note">ไป Sales Zone และ Branch Analysis</span></div></div>
+    </section>
+    <section class="card">
+      <h3>Executive Message</h3><div class="cap">ข้อความสรุปสำหรับผู้บริหาร</div>
+      <div class="message">รายได้เดือนสิงหาคม 2569 สูงกว่าปีก่อน แต่ Gross Profit และ Margin ลดลง ขณะที่ SG&A สูงขึ้น ส่งผลให้ Operating Profit และ PBT ลดลงอย่างมีนัยสำคัญ จึงควรติดตาม Cost Ratio, ค่าใช้จ่ายหลัก และหน่วย/สาขาที่กดผลกำไรต่อเนื่อง</div>
+      <div class="actions"><button>ดู P&L</button><button>ดู Sales Zone</button><button>ดู Branch</button><button>ดู Operations</button></div>
+    </section>
+  </div>
+</main>
+</div>
+<script>
+const vals69=[361.56,309.62,335.90,322.44,309.81,309.09,331.77,335.22], vals68=[318.93,280.38,306.03,325.71,319.44,307.58,315.62,313.13], labels=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.'];
+const box=document.getElementById('trendChart'), w=box.clientWidth||700, h=210, min=270, max=370;
+function pt(v,i){return {x:28+i*(w-60)/7,y:15+(max-v)/(max-min)*(h-45)}}
+function seg(a,b,cls){let dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)*180/Math.PI;let d=document.createElement('div');d.className='line '+cls;d.style.left=a.x+'px';d.style.top=a.y+'px';d.style.width=len+'px';d.style.transform='rotate('+ang+'deg)';box.appendChild(d)}
+for(let i=0;i<7;i++){seg(pt(vals68[i],i),pt(vals68[i+1],i+1),'old');seg(pt(vals69[i],i),pt(vals69[i+1],i+1),'')}
+labels.forEach((m,i)=>{let s=document.createElement('span');s.textContent=m;s.style.cssText=`position:absolute;left:${pt(300,i).x-10}px;bottom:3px;font-size:10px;color:#6c7888`;box.appendChild(s)})
+</script>
+</body>
+</html>

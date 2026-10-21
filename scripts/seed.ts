@@ -1,13 +1,12 @@
-// สร้าง role, permission, ผังบัญชี และบัญชี admin เริ่มต้น — รันซ้ำได้
+// สร้าง role, permission, ผังบัญชี, ผังหน่วย (ตามโค้ด) และบัญชี admin เริ่มต้น — รันซ้ำได้
 import "dotenv/config";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
-import { db, pool } from "@/db";
-import { permissions, rolePermissions, roles, userRoles, users, userUnitScopes } from "@/db/schema";
-import { PERMISSIONS, ROLES } from "@/lib/authz/scope";
-import { syncAccounts } from "@/lib/import-workbook";
-
-const ROOT_UNIT = "MSP";
+import { db, pool } from "@/backend/db";
+import { permissions, rolePermissions, roles, userRoles, users, userUnitScopes } from "@/backend/db/schema";
+import { PERMISSIONS, ROLES } from "@/backend/lib/authz/scope";
+import { masterYears, recomputeStatements, syncAccounts, syncUnitTree } from "@/backend/lib/import-workbook";
+import { ROOT_CODE as ROOT_UNIT } from "@/backend/lib/master-import/units";
 
 async function main() {
   for (const [code, description] of Object.entries(PERMISSIONS)) {
@@ -19,7 +18,19 @@ async function main() {
     await db.delete(rolePermissions).where(eq(rolePermissions.roleId, role.id));
     await db.insert(rolePermissions).values(r.permissions.map((p) => ({ roleId: role.id, permissionCode: p })));
   }
-  await syncAccounts(db);
+  // ผังหน่วยกำหนดในโค้ด — แทนผังของทุกปีที่มีข้อมูลหลักแล้วคำนวณงบที่มีอยู่ใหม่ตามผังนี้
+  // ยังไม่มีปีใดเลย (ติดตั้งใหม่) = สร้างข้อมูลหลักของปีปัจจุบันจากค่าเริ่มต้นในโค้ด
+  const years = await masterYears(db);
+  if (years.length === 0) years.push(new Date().getFullYear());
+  for (const year of years) {
+    await syncAccounts(db, year);
+    const tree = await db.transaction(async (tx) => {
+      const change = await syncUnitTree(tx, year);
+      await recomputeStatements(tx, [year]);
+      return change;
+    });
+    console.log(`ผังหน่วยปี ${year + 543}: เพิ่ม ${tree.added.length} · ลบ ${tree.removed.length} · แก้ ${tree.updated.length}`);
+  }
 
   const [existing] = await db.select().from(users).where(eq(users.username, "admin"));
   if (existing) {

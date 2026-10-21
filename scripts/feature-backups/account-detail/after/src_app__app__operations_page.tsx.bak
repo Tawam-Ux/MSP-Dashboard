@@ -1,0 +1,330 @@
+import Link from "next/link";
+import { Suspense } from "react";
+import { OperationsSkeleton, paramsKey } from "@/frontend/components/skeleton";
+import { Empty, InfoRow, Kpi, MoneyKpi, NoData, RankBar, pickPeriods, readParam } from "@/frontend/components/dash";
+import { Icon } from "@/frontend/components/icons";
+import { RouteLine } from "@/frontend/components/route-line";
+import { PageHeader } from "@/frontend/components/page-header";
+import { PeriodSelect } from "@/frontend/components/period-select";
+import { UnitDetail } from "@/frontend/components/unit-detail";
+import { classifyUnits, expenseAccounts, financeCost, ratioOf } from "@/backend/lib/analysis";
+import { Money, MoneyToggle, MoneyUnit } from "@/frontend/components/money";
+import { formatPct, formatPeriods } from "@/backend/lib/format";
+import { getStatements, listPeriods, listUnits, type UnitNode } from "@/backend/lib/reports";
+import { requirePermission } from "@/backend/lib/session";
+import type { Statement } from "@/backend/lib/statement";
+
+type Op = UnitNode & { s: Statement };
+
+// เกณฑ์แจ้งเตือนใน Watch List
+const LOW_GP_MARGIN = 10;
+const HIGH_SGA_RATIO = 20;
+
+type SearchParams = Awaited<PageProps<"/operations">["searchParams"]>;
+
+export default async function OperationsPage({ searchParams }: PageProps<"/operations">) {
+  const sp = await searchParams;
+  // เปลี่ยนงวด → แสดง skeleton ระหว่างโหลด; คลิกดูหน่วย (unit) ไม่ต้อง เพราะต้องเลื่อนไปที่ #anchor
+  return (
+    <Suspense key={paramsKey(sp, ["unit"])} fallback={<OperationsSkeleton />}>
+      <OperationsContent sp={sp} />
+    </Suspense>
+  );
+}
+
+async function OperationsContent({ sp }: { sp: SearchParams }) {
+  const user = await requirePermission("dashboard.view");
+  const periods = await listPeriods(user);
+  if (periods.length === 0 || !user.defaultUnit) return <NoData user={user} />;
+  // งวดเดียวหรือหลายเดือนรวมกัน (?period=a,b หรือ all)
+  const pick = pickPeriods(periods, readParam(sp, "period"));
+  const period = pick.param;
+  const periodLabel = formatPeriods(pick.list, pick.all);
+
+  const { operations } = classifyUnits(await listUnits(user));
+  if (operations.length === 0) {
+    return <Empty title="ไม่มีหน่วยปฏิบัติการในสิทธิ์ของบัญชีนี้">หน้านี้แสดงสำนักงานใหญ่ ขนส่ง และโรงงาน ที่ไม่ได้อยู่ในโซนขาย</Empty>;
+  }
+
+  const statements = await getStatements(user, pick.sel, [user.defaultUnit, ...operations.map((o) => o.code)]);
+  const company = statements.get(user.defaultUnit)!;
+  const ops: Op[] = operations.map((o) => ({ ...o, s: statements.get(o.code)! }));
+  const profitCenters = ops.filter((o) => o.s.totals.REV > 0);
+  const costCenters = ops.filter((o) => o.s.totals.REV === 0);
+
+  const sum = (f: (s: Statement) => number) => ops.reduce((t, o) => t + f(o.s), 0);
+  const revenue = sum((s) => s.totals.REV);
+  const spend = sum((s) => s.totals.TOTAL_COST + s.totals.SGA + financeCost(s));
+  const op = sum((s) => s.totals.OP);
+  const losing = ops.filter((o) => o.s.totals.PBT < 0);
+  // หน่วยที่คลิกดูรายละเอียด — แสดงในหน้านี้ ไม่พาไปหน้าอื่น
+  const selected = ops.find((o) => o.code === readParam(sp, "unit"));
+  const pageHref = (unit?: string) => `/operations?${new URLSearchParams(unit ? { period, unit } : { period })}`;
+  // เปิดดูหน่วย = หน้ารายละเอียดของหน่วยนั้น ไม่ต้องเลื่อนไปที่ anchor (ส่วนอื่นของหน้าถูกซ่อนทั้งหมด)
+  const unitHref = (code: string) => pageHref(code);
+
+  // รวมบัญชีค่าใช้จ่ายของทุกหน่วยปฏิบัติการ
+  const allExpenses = new Map<string, { name: string; value: number }>();
+  for (const o of ops) for (const e of expenseAccounts(o.s)) {
+    const cur = allExpenses.get(e.code);
+    allExpenses.set(e.code, { name: e.name, value: (cur?.value ?? 0) + e.value });
+  }
+  const topExpenses = [...allExpenses.entries()].map(([code, v]) => ({ code, ...v })).sort((a, b) => b.value - a.value).slice(0, 6);
+
+  const actions = (
+    <>
+      <PeriodSelect periods={periods} value={pick.list} all={pick.all} />
+      <MoneyToggle />
+    </>
+  );
+  const route = (
+    <RouteLine
+      label="ตำแหน่งในหน่วยปฏิบัติการ"
+      stops={[
+        { label: "Operations", sub: `${ops.length} หน่วย`, href: selected ? pageHref() : undefined, instant: true, state: selected ? ("past" as const) : ("now" as const) },
+        selected
+          ? { label: selected.name, sub: "ดูงบด้านล่าง", state: "now" as const }
+          : { label: "หน่วย", sub: "คลิกชื่อหน่วยเพื่อดูงบ", state: "next" as const },
+      ]}
+    />
+  );
+
+  // ดูรายละเอียดหน่วย: ซ่อน KPI อันดับ และตารางทั้งหมด — เหลือหัวหน้า แถบตำแหน่ง (กดกลับได้) และการ์ดของหน่วย
+  if (selected) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title="Operations" caption={`${periodLabel} · รายละเอียดหน่วยปฏิบัติการ`} actions={actions} />
+        {route}
+        <UnitDetail title="รายละเอียดหน่วยปฏิบัติการ" name={selected.name} statement={selected.s} closeHref={pageHref()} source={{ unit: selected.code, periods: pick.list, periodLabel }} />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <PageHeader title="Operations" caption={`${periodLabel} · สำนักงานใหญ่ ขนส่ง และโรงงาน ${ops.length} หน่วย`} actions={actions} />
+
+      {route}
+
+      <section aria-label="ตัวเลขหลัก" className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:grid-cols-4">
+        <MoneyKpi label="รายได้หน่วยปฏิบัติการ" value={revenue} line="rev" code="REV" note={`${formatPct(ratioOf(revenue, company.totals.REV))} ของรายได้ทั้งบริษัท`} />
+        <MoneyKpi label="ต้นทุนและค่าใช้จ่ายรวม" value={spend} line="ink" code="EXP" note={`รวมหน่วยที่ไม่มีรายได้ ${costCenters.length} หน่วย`} />
+        <MoneyKpi label="กำไรจากการดำเนินงาน" value={op} line="op" code="OP" note={`OP Margin ${formatPct(ratioOf(op, revenue))}`} />
+        <Kpi
+          label="หน่วยขาดทุน"
+          value={losing.length}
+          unit={`จาก ${ops.length} หน่วย`}
+          line="msp"
+          code="LOSS"
+          note={losing.length ? <>ขาดทุนรวม <Money value={losing.reduce((t, o) => t + o.s.totals.PBT, 0)} unit="short" /></> : "ทุกหน่วยมีกำไร"}
+        />
+      </section>
+
+      {/* ไม่มีศูนย์ต้นทุน = การ์ดค่าใช้จ่ายส่วนกลางว่างทั้งใบ จึงไม่แสดง และให้ตารางเต็มความกว้าง */}
+      <div className={`grid gap-4 ${costCenters.length > 0 ? "lg:grid-cols-[1.5fr_1fr]" : ""}`}>
+        <section className="card card-fixed card-xl">
+          <h2 className="card-title">Unit Performance</h2>
+          <p className="card-cap">ผลประกอบการของแต่ละหน่วย (<MoneyUnit long />) · คลิกชื่อเพื่อดูงบเต็มด้านบน</p>
+          <div className="card-body">
+            <table className="tbl">
+              <thead>
+                <tr>
+                  <th>หน่วย</th>
+                  <th className="text-right!">รายได้</th>
+                  <th className="text-right!">GP%</th>
+                  <th className="text-right!">SG&A</th>
+                  <th className="text-right!">PBT</th>
+                  <th className="text-right!">PBT%</th>
+                  <th>สถานะ</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...ops].sort((a, b) => b.s.totals.REV - a.s.totals.REV || a.s.totals.PBT - b.s.totals.PBT).map((o) => {
+                  const t = o.s.totals;
+                  return (
+                    <tr key={o.code}>
+                      <td>
+                        <Link href={unitHref(o.code)} className="font-semibold hover:text-brand hover:underline">
+                          {o.name}
+                        </Link>
+                      </td>
+                      <td className="num text-right"><Money value={t.REV} /></td>
+                      <td className="num text-right">{formatPct(ratioOf(t.GP, t.REV))}</td>
+                      <td className="num text-right"><Money value={t.SGA} /></td>
+                      <td className={`num text-right font-semibold ${t.PBT < 0 ? "text-loss-text" : "text-good"}`}><Money value={t.PBT} /></td>
+                      <td className="num text-right text-ink-2">{formatPct(ratioOf(t.PBT, t.REV))}</td>
+                      <td>
+                        {t.REV === 0 ? (
+                          <span className="badge badge-muted">ศูนย์ต้นทุน</span>
+                        ) : (
+                          <span className={`badge ${t.PBT < 0 ? "badge-bad" : "badge-good"}`}>{t.PBT < 0 ? "ขาดทุน" : "กำไร"}</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {costCenters.length > 0 && <CentralCost costCenters={costCenters} companyRevenue={company.totals.REV} />}
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.5fr_1fr]">
+        <CostStructure rows={profitCenters} />
+        <section className="card card-fixed card-md">
+          <h2 className="card-title">ค่าใช้จ่ายดำเนินงานหลัก</h2>
+          <p className="card-cap">รวมทุกหน่วยปฏิบัติการ 6 อันดับแรก (<MoneyUnit long />)</p>
+          <div className="card-body">
+            {topExpenses.length === 0 ? (
+              <p className="text-sm text-ink-3">ไม่มีค่าใช้จ่ายในงวดนี้</p>
+            ) : (
+              topExpenses.map((e, i) => (
+                <RankBar key={e.code} label={`${i + 1}. ${e.name}`} pct={(e.value / topExpenses[0].value) * 100} display={<Money value={e.value} />} tone="loss" />
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+
+      <WatchList ops={ops} hrefFor={unitHref} />
+    </div>
+  );
+}
+
+function CentralCost({ costCenters, companyRevenue }: { costCenters: Op[]; companyRevenue: number }) {
+  const spend = (s: Statement) => s.totals.TOTAL_COST + s.totals.SGA + financeCost(s);
+  const total = costCenters.reduce((t, o) => t + spend(o.s), 0);
+  const biggest = [...costCenters].sort((a, b) => spend(b.s) - spend(a.s))[0];
+
+  return (
+    <section className="card card-fixed card-xl">
+      <h2 className="card-title">ค่าใช้จ่ายส่วนกลาง</h2>
+      <p className="card-cap">หน่วยที่ไม่มีรายได้ (Cost Center) ไม่จัดอันดับเป็น Profit Center</p>
+      <div className="card-body">
+        {costCenters.length === 0 ? (
+          <p className="text-sm text-ink-3">ไม่มีหน่วยที่เป็นศูนย์ต้นทุน</p>
+        ) : (
+          <>
+            <p className="rounded-[18px] bg-(--pill) px-4.5 py-3.5 text-sm leading-relaxed text-(--pill-fg)">
+              ค่าใช้จ่ายส่วนกลางรวม <b className="num"><Money value={total} unit="long" /></b> คิดเป็น{" "}
+              <b className="num">{formatPct(ratioOf(total, companyRevenue))}</b> ของรายได้ทั้งบริษัท
+            </p>
+            <div className="mt-3">
+              {costCenters.map((o) => (
+                <InfoRow key={o.code} label={o.name} value={<Money value={spend(o.s)} unit="short" />} />
+              ))}
+            </div>
+            {biggest && (
+              <div className="mt-3 rounded-[18px] bg-surface-2 px-4 py-3">
+                <h3 className="text-[0.8125rem] font-semibold text-navy">ค่าใช้จ่ายหลักของ {biggest.name}</h3>
+                {expenseAccounts(biggest.s).slice(0, 3).map((e) => (
+                  <InfoRow key={e.code} label={e.name} value={<Money value={e.value} />} sub={formatPct(ratioOf(e.value, spend(biggest.s)))} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </section>
+  );
+}
+
+const SEGMENTS = [
+  { key: "cost", label: "ต้นทุนขาย", color: "var(--seg-cogs)", of: (s: Statement) => s.totals.TOTAL_COST },
+  { key: "selling", label: "ค่าใช้จ่ายขาย", color: "var(--seg-selling)", of: (s: Statement) => s.totals.SELLING },
+  { key: "admin", label: "ค่าใช้จ่ายบริหาร", color: "var(--seg-admin)", of: (s: Statement) => s.totals.ADMIN },
+  { key: "finance", label: "ค่าเสื่อมและดอกเบี้ย", color: "var(--seg-finance)", of: financeCost },
+  { key: "profit", label: "กำไรก่อนภาษี", color: "var(--seg-profit)", of: (s: Statement) => Math.max(0, s.totals.PBT) },
+];
+
+/** แถบ 100 บาทต่อหน่วย: ถ้าค่าใช้จ่ายเกินรายได้ เส้นรายได้จะอยู่ก่อนปลายแถบ ส่วนเกินคือขาดทุน */
+function CostStructure({ rows }: { rows: Op[] }) {
+  return (
+    <section className="card card-fixed card-md">
+      <h2 className="card-title">โครงสร้างต้นทุนต่อรายได้ 100 บาท</h2>
+      <p className="card-cap">เฉพาะหน่วยที่มีรายได้ · เส้นดำคือรายได้ 100 บาท ถ้าแถบยาวเกินเส้นแปลว่าขาดทุน</p>
+      <ul className="mb-3 flex flex-wrap gap-x-4 gap-y-1 text-[0.8125rem] text-ink-2">
+        {SEGMENTS.map((s) => (
+          <li key={s.key} className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-full" style={{ background: s.color }} aria-hidden />
+            {s.label}
+          </li>
+        ))}
+      </ul>
+      {rows.length === 0 ? (
+        <p className="text-sm text-ink-3">ไม่มีหน่วยที่มีรายได้ในงวดนี้</p>
+      ) : (
+        <div className="card-body space-y-2.5 py-1">
+          {rows.map((o) => {
+            const rev = o.s.totals.REV;
+            const parts = SEGMENTS.map((seg) => ({ ...seg, amount: Math.max(0, seg.of(o.s)) }));
+            const span = Math.max(rev, parts.reduce((t, p) => t + p.amount, 0));
+            const per100 = (n: number) => ((n / rev) * 100).toFixed(1);
+            return (
+              <div key={o.code} className="grid grid-cols-[7rem_1fr] items-center gap-3 sm:grid-cols-[8.5rem_1fr]">
+                <span className="truncate text-[0.8125rem] font-semibold">{o.name}</span>
+                <div className="relative">
+                  <div className="bar-fill flex h-6 gap-1 rounded-full bg-surface-2 p-1">
+                    {parts.filter((p) => p.amount > 0).map((p) => (
+                      <div
+                        key={p.key}
+                        title={`${p.label} ${per100(p.amount)} บาท ต่อรายได้ 100 บาท`}
+                        className="rounded-full"
+                        style={{ flex: `${p.amount / span} 1 0%`, background: p.color, minWidth: 4 }}
+                      />
+                    ))}
+                  </div>
+                  {rev < span && (
+                    <div className="pointer-events-none absolute -inset-y-1 w-1 -translate-x-1/2 rounded-full bg-ink" style={{ left: `${(rev / span) * 100}%` }} aria-hidden />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function WatchList({ ops, hrefFor }: { ops: Op[]; hrefFor: (code: string) => string }) {
+  type Alert = { code: string; tone: "r" | "o"; title: React.ReactNode; note: string };
+  const alerts: Alert[] = [];
+  for (const o of [...ops].sort((a, b) => a.s.totals.PBT - b.s.totals.PBT)) {
+    const t = o.s.totals;
+    if (t.REV > 0 && t.PBT < 0) alerts.push({ code: o.code, tone: "r", title: <>{o.name} ขาดทุน <Money value={-t.PBT} unit="short" /></>, note: `PBT Margin ${formatPct(ratioOf(t.PBT, t.REV))}` });
+    const gpm = ratioOf(t.GP, t.REV);
+    if (gpm != null && gpm < LOW_GP_MARGIN) alerts.push({ code: o.code, tone: gpm < 0 ? "r" : "o", title: `${o.name} GP Margin ${formatPct(gpm)}`, note: `ต่ำกว่าเกณฑ์ ${LOW_GP_MARGIN}% · ดูต้นทุนขาย` });
+    const sga = ratioOf(t.SGA, t.REV);
+    if (sga != null && sga > HIGH_SGA_RATIO) alerts.push({ code: o.code, tone: "o", title: `${o.name} SG&A ${formatPct(sga)} ของรายได้`, note: `สูงกว่าเกณฑ์ ${HIGH_SGA_RATIO}% · ดูค่าใช้จ่ายบริหาร` });
+  }
+
+  return (
+    <section className="card card-fixed card-md">
+      <h2 className="card-title">Watch List</h2>
+      <p className="card-cap">
+        รายการที่ควรคลิกไปดูต่อ · เกณฑ์: ขาดทุน, GP Margin ต่ำกว่า {LOW_GP_MARGIN}%, SG&A สูงกว่า {HIGH_SGA_RATIO}% ของรายได้
+      </p>
+      {alerts.length === 0 ? (
+        <p className="panel panel-good flex items-center gap-2 text-sm text-good"><Icon name="check" size={14} stroke={3} />ไม่มีหน่วยที่เข้าเกณฑ์ต้องติดตาม</p>
+      ) : (
+        <ul className="card-body grid content-start gap-x-6 sm:grid-cols-2">
+          {alerts.map((a, i) => (
+            <li key={i} className="flex gap-2.5 border-b border-line py-2 text-[0.8125rem]">
+              <span className={`mt-1.5 size-2.5 shrink-0 rounded-full ${a.tone === "r" ? "bg-loss" : "bg-warn"}`} aria-hidden />
+              <div>
+                <Link href={hrefFor(a.code)} className="font-semibold hover:text-brand hover:underline">{a.title}</Link>
+                <div className="text-xs text-ink-2">
+                  <span className="sr-only">{a.tone === "r" ? "ร้ายแรง: " : "เฝ้าระวัง: "}</span>
+                  {a.note}
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

@@ -1,15 +1,13 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/session";
-import { LoginForm } from "./login-form";
+import { safeCallbackUrl } from "@/backend/lib/redirect";
+import { getCurrentUser } from "@/backend/lib/session";
+import { LampLogin } from "./lamp-login";
 
-export default async function LoginPage() {
-  if (await getCurrentUser()) redirect("/");
+export default async function LoginPage({ searchParams }: PageProps<"/login">) {
+  // ?callbackUrl= ส่งมาจากแอปหลังบ้านหรือหน้าที่ต้องล็อกอินก่อน
+  const callbackUrl = safeCallbackUrl((await searchParams).callbackUrl);
+  if (await getCurrentUser()) redirect(callbackUrl);
 
-  return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-4">
-      <h1 className="font-display text-3xl font-semibold">MSP งบกำไรขาดทุน</h1>
-      <p className="mt-1 mb-8 text-ink-2">เข้าสู่ระบบเพื่อดูผลประกอบการรายเดือน</p>
-      <LoginForm />
-    </main>
-  );
+  // ห้องมืดกับโคมไฟแขวน: ดึงสายเปิดไฟ แล้วการ์ดเข้าสู่ระบบจึงปรากฏในลำแสง
+  return <LampLogin callbackUrl={callbackUrl} />;
 }

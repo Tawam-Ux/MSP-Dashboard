@@ -43,4 +43,23 @@ next-env.d.ts
 # ข้อมูลการเงินจริง ไม่เก็บใน git
 /Data.xlsx
 *.xlsx
+# ไฟล์ Master ที่นำเข้า (ไฟล์ที่ใช้อยู่ + รอ backup ขึ้น Google Drive)
+/storage/
 !.env.example
+
+# แอปหลังบ้าน (react-admin) แยกโปรเจกต์อยู่ใน admin-app/
+/admin-app/node_modules/
+/admin-app/dist/
+
+# สำเนาโค้ดก่อนแก้ใหญ่ เก็บไว้ในเครื่องเท่านั้น
+/backup/
+/_globals.css.before-blue.bak
+
+# เครื่องมือ AI/ออกแบบในเครื่อง (ภาพหน้าจอมีตัวเลขการเงินจริง) — ไม่เก็บใน git
+/.claude/
+/.impeccable/
+/skills-lock.json
+
+# ไฟล์ตัวอย่างข้อมูลจริงและภาพหน้าจอที่ส่งให้ AI · แบบดีไซน์แบบ zip (ซ้ำกับ Preview/html)
+/PreView_ForClaude/
+/Preview/zip/

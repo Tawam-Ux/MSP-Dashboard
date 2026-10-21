@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // สำเนา backup ก่อนแก้ UI — ไม่ใช่ส่วนที่ต้องตรวจ
+    "backup/**",
+    // แอปหลังบ้านแยก มี tsconfig/lint ของตัวเอง
+    "admin-app/**",
   ]),
 ]);
 

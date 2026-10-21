@@ -1,0 +1,17 @@
+{
+  "before": {
+    "src/frontend/components/statement-table.tsx": "4185942f783e717494484a8fb8306bc5ecebfe8385a8b0dc7a09b01baeaa1eb2",
+    "src/frontend/components/unit-detail.tsx": "988c6a74f176a97948691226806236846c38907e60d3290aadf706e06db2b8f7",
+    "src/app/(app)/zones/page.tsx": "8bbd56c79260b12ea35550c2bde1855f7a92ae536f676f7f4121e85c36fe574c",
+    "src/app/(app)/operations/page.tsx": "9de1e960a2589be6fcfebc397ea8ca557ce32e69f59221e3921bd103901d6469"
+  },
+  "after": {
+    "src/frontend/components/statement-table.tsx": "64304cf6eaf078df822aa26424b0672eda4438b999c604359116e24b2e2ab0e1",
+    "src/frontend/components/unit-detail.tsx": "7f995ab66578a8e2cdf760e75563626cea79bea086497b736cf2d54c470c389e",
+    "src/app/(app)/zones/page.tsx": "2a2c4e49ea567c822ea5252d8628e7e62744e48447e69ce2d132e6aaf4fae278",
+    "src/app/(app)/operations/page.tsx": "9812b133f9bfe6f4ccb0893d1cda527f0bab35207c4c80acf303629536761ba8",
+    "src/backend/lib/account-detail.ts": "01aa37970369728f313d7a8bd5df87c9ecc3bffab814a66261d735acc8926980",
+    "src/app/api/account-detail/route.ts": "ea28073f1845fa9dc41f3cf0a2319d13780f4f58f5faf6377037442faf66776b",
+    "src/frontend/components/account-detail.tsx": "12fc4c4ebc027e5b98c81f73095b181d22de72e12acb420de41a10042a2b7bbb"
+  }
+}
